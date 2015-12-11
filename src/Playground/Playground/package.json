@@ -1,0 +1,14 @@
+{
+  "name": "Playground",
+  "version": "0.0.0",
+  "description": "Playground",
+  "main": "app.js",
+  "author": {
+    "name": "fmiuser",
+    "email": ""
+  },
+  "dependencies": {
+    "jimp": "^0.2.20",
+    "socket.io": "^1.3.7"
+  }
+}
