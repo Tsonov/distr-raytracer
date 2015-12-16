@@ -17,7 +17,7 @@ var clip = function (width, height, maxWidth, maxHeight) {
 var splitWork = function(width, height) {
     // TODO: Handle cases of various worker length
     // TODO: Better algorithm
-    var bucketCount = 4;
+    var bucketCount = 10;
     if (height >= bucketCount) {
         var bucketHeight = Math.ceil(height / bucketCount);
         var result = [];
