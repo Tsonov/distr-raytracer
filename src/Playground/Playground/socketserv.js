@@ -1,4 +1,5 @@
-﻿var socketio = require('socket.io'),
+﻿'use strict'
+var socketio = require('socket.io'),
     http = require('http'),
     fs = require('fs'),
     Jimp = require('jimp');
@@ -6,28 +7,53 @@
 var log = console.log.bind(console);
 var server = http.createServer();
 
-var jobs = [];
-jobs.push({
-    x: 0, 
-    y: 0,
-    width: 255,
-    height: 255
-});
-jobs.push({
-    x: 0, 
-    y: 255,
-    width: 255,
-    height: 255
-});
-
 var totalWidth = 255;
 var totalHeight = 255 * 2;
+
+var clip = function (width, height, maxWidth, maxHeight) {
+
+}
+
+var splitWork = function(width, height) {
+    // TODO: Handle cases of various worker length
+    // TODO: Better algorithm
+    var bucketCount = 4;
+    if (height >= bucketCount) {
+        var bucketHeight = Math.ceil(height / bucketCount);
+        var result = [];
+        for (var i = 0; i < bucketCount; i++) {
+            // TODO: Splitting only by height for now...so the x and width is constant, only y and height changes
+            result.push({
+                x: 0, 
+                y: bucketHeight * i,
+                width: width,
+                height: bucketHeight
+            });
+        }
+        // TODO: Floating point comparisons?
+        if (bucketCount * bucketHeight < height) {
+            // Add one more bucket with the leftovers
+            //result.pish({
+            //    x: 0,
+            //    y: bucketCount * bucketHeight,
+            //    width: width,
+            //    height: height - (bucketCount * bucketHeight)
+            //})
+        }
+        return result;
+    } else {
+        // TODO: Implement
+    }
+}
+
+var jobs = splitWork(totalWidth, totalHeight);
+var expectedResponsesCount = jobs.length;
 var image = new Jimp(totalWidth, totalHeight, 0xff0000ff);
 
 log("Starting server");
 var server = new socketio();
 
-var childresponsehandler = function (renderResult) {
+var childresponsehandler = function (socket, renderResult) {
     log("Child has rendered a result");
     var width = renderResult.width;
     var height = renderResult.height;
@@ -43,12 +69,23 @@ var childresponsehandler = function (renderResult) {
         this.bitmap.data[idx + 3] = 255; // A, use full alpha
     });
 
-
+    expectedResponsesCount--;
     // TODO: Extract
-    if (jobs.length == 0) {
+    if (expectedResponsesCount === 0) {
+        if (jobs.length !== 0) throw "Invalid job count. Queue should be empty because all responses came back, real queue length was " + jobs.length;
         log("Outputing image");
         image.write("out_server.bmp");
         server.close();
+    } else {
+        var newJob = jobs.pop();
+        socket.emit("message", "You will receive a new job shortly");
+        socket.emit("render", newJob);
+    }
+}
+
+var socketHandlerCapture = function(socketref, handler) {
+    return function (responseData) {
+        handler(socketref, responseData);
     }
 }
 
@@ -61,7 +98,7 @@ server.on('connection', function (socket) {
     } else {
         var job = jobs.pop();
         socket.emit("message", "You got connected successfully and will receive a job shortly");
-        socket.on("render-finished", childresponsehandler);
+        socket.on("render-finished", socketHandlerCapture(socket, childresponsehandler));
         
         socket.emit("render", job);
     }

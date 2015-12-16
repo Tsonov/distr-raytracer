@@ -1,4 +1,5 @@
-﻿var socketio = require("socket.io-client");
+﻿'use strict'
+var socketio = require("socket.io-client");
 var log = console.log.bind(console);
 var Jimp = require("jimp"),
     spawn = require("child_process").spawn,
