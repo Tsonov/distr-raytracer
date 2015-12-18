@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Dis.RayTracer", "Dis.RayTracer.njsproj", "{E64625F3-109A-49FF-8B6B-54FD6D93641E}"
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Dis.RayTracer", "Dis.RayTracer.Web\Dis.RayTracer.Web.njsproj", "{E64625F3-109A-49FF-8B6B-54FD6D93641E}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Dis.RayTracer.Core", "Dis.RayTracer.Core\Dis.RayTracer.Core.njsproj", "{105A25D7-A1FA-49B4-9C12-5F22E2F54656}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{E64625F3-109A-49FF-8B6B-54FD6D93641E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E64625F3-109A-49FF-8B6B-54FD6D93641E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E64625F3-109A-49FF-8B6B-54FD6D93641E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{105A25D7-A1FA-49B4-9C12-5F22E2F54656}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{105A25D7-A1FA-49B4-9C12-5F22E2F54656}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{105A25D7-A1FA-49B4-9C12-5F22E2F54656}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{105A25D7-A1FA-49B4-9C12-5F22E2F54656}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

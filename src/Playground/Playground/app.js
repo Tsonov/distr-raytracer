@@ -4,9 +4,10 @@ var log = console.log.bind(console);
 var Jimp = require("jimp"),
     spawn = require("child_process").spawn,
     fs = require("fs"),
-    split = require("split");
+    split = require("split"),
+    os = require("os");
 
-var socket = new socketio("http://localhost:3000");
+var socket = new socketio("http://localhost:3000/worker-ns");
 
 // TODO: Library
 var unsignedColorToNums = function (number, hasAlpha) {
@@ -28,6 +29,13 @@ var stringToColorNums = function (unsignedAsString) {
 
 socket.on("connect", function () {
     log("Connected successfully");
+    var introductoryData = {
+        cores: os.cpus().length,
+        totalMemory: os.totalmem(),
+        platform: os.platform(),
+        hostname: os.hostname()
+    };
+    socket.emit("introduce", introductoryData);
 })
 
 socket.on("render", function (imageparams) {

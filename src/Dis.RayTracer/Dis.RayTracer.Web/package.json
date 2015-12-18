@@ -1,13 +1,13 @@
 {
-  "name": "Dis.RayTracer",
+  "name": "Dis.RayTracer.Web",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
-  "description": "Dis.RayTracer",
+  "description": "Dis.RayTracer.Web",
   "author": {
-    "name": "fmiuser",
+    "name": "Tsonov",
     "email": ""
   },
   "dependencies": {
