@@ -1,0 +1,11 @@
+﻿extends layout
+
+block content
+  h1= title
+  #main
+    #loading
+        p.
+            Loading data from the server...
+    ul#workers
+        each val in nodes
+            li= val

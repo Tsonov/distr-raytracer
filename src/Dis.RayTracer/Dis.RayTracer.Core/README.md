@@ -1,3 +1,0 @@
-﻿# Dis.RayTracer.Core
-
-
