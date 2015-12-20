@@ -9,3 +9,8 @@ block content
     ul#workers
         each val in nodes
             li= val
+    input#startRendering(type="button", value="Start rendering")
+
+block scripts
+    script(src='/socket.io/socket.io.js')
+    script(src='/js/rending.js')

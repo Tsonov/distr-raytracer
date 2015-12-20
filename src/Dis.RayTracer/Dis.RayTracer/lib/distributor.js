@@ -8,9 +8,8 @@ var socketio = require('socket.io'),
 exports.distributor = distributor;
 
 
-function distributor(/* TODO: params */) {
-    var socketServer = socketio(),
-        availableSockets = {},
+function distributor(socketServer/* TODO: params */) {
+    var availableSockets = {},
         clientNs = socketServer.of("/client-ns"),    
         workerNs = socketServer.of("/worker-ns");
     
@@ -54,7 +53,7 @@ function distributor(/* TODO: params */) {
         
         workerSocket.on("error", log);
     }
-
+    
     function startRendering(renderParams /* TODO What parameters should be here? */) {
         log(renderParams);
         initRendering(clientSocket, renderParams.workers, availableSockets, renderParams.width, renderParams.height);

@@ -1,21 +1,27 @@
 ﻿var express = require('express'),
     path = require('path'),
-    favicon = require('serve-favicon'),
     logger = require('morgan'),
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
     routes = require('./routes/index'),
-    users = require('./routes/users');
+    users = require('./routes/users'),
+    socketio = require('socket.io'),
+    distributor = require('./lib/distributor.js').distributor,
+    http = require('http'),
+    helpers = require('./lib/helpers.js');
 
 
-var app = express();
+var app = express(),
+    server = http.Server(app),
+    sockio = socketio(server)
+    distributor = distributor(sockio),
+    log = helpers.log;
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -25,6 +31,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
+app.use('/socket.io.client.js', function (req, res) {
+    
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -57,5 +66,5 @@ app.use(function (err, req, res, next) {
     });
 });
 
-
-module.exports = app;
+module.exports.app = app;
+module.exports.server = server;

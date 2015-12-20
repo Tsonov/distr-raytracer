@@ -3,7 +3,7 @@ var socketio = require("socket.io-client"),
     fs = require('fs');
 var log = console.log.bind(console);
 
-var socket = new socketio("http://localhost:3000/client-ns");
+var socket = new socketio("http://localhost:1337/client-ns");
 var totalWidth = 255;
 var totalHeight = 255 * 2;
 
