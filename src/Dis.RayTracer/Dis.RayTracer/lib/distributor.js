@@ -1,7 +1,9 @@
 ﻿'use strict'
 var socketio = require('socket.io'),
     http = require('http'),
-    log = require('./helpers.js').log;
+    log = require('./helpers.js').log,
+    JobManager = require('./job-manager.js'),
+    ImageMaster = require('./img-master.js');
 
 /* Exports */
 exports.distributor = distributor;
@@ -60,48 +62,6 @@ function distributor(socketServer/* TODO: params */) {
         workerSocket.on("error", log);
     }
     
-    var splitWork = function (width, height) {
-        // TODO: Handle cases of various worker length
-        // TODO: Better algorithm
-        var bucketCount = 4;
-        if (height >= bucketCount) {
-            var bucketHeight = Math.floor(height / bucketCount);
-            var result = [];
-            for (var i = 0; i < bucketCount; i++) {
-                // TODO: Splitting only by height for now...so the x and width is constant, only y and height changes
-                result.push({
-                    x: 0, 
-                    y: bucketHeight * i,
-                    width: width,
-                    height: bucketHeight
-                });
-            }
-            // TODO: Floating point comparisons?
-            if (bucketCount * bucketHeight < height) {
-                // Add one more bucket with the leftovers
-                result.push({
-                    x: 0,
-                    y: bucketCount * bucketHeight,
-                    width: width,
-                    height: height - (bucketCount * bucketHeight)// TODO: Check math here
-                })
-            }
-            return result;
-        } else {
-            // TODO: Better algorithm as well
-            var result = [];
-            for (var i = 0; i < height; i++) {
-                result.push({
-                    x: 0,
-                    y: i,
-                    width: width,
-                    height: 1
-                })
-            }
-            return result;
-        }
-    }
-    
     var createPool = function (socketsToInclude, socketStorage) {
         var pool = socketsToInclude.map(function (socketId) {
             var result = socketStorage[socketId];
@@ -119,45 +79,28 @@ function distributor(socketServer/* TODO: params */) {
         // TODO: Refactor
         var childresponsehandler = function (socket, renderResult) {
             log("Child " + socket.id + " has rendered a result");
-            doneJobs.push({}); // TODO: Maybe pointless to be an array but fix later....
-            var width = renderResult.width;
-            var height = renderResult.height;
-            var startX = renderResult.startX;
-            var startY = renderResult.startY;
+            manager.jobDone(renderResult);
             log("Rendered result with width " + width + " and height " + height + " from [" + startX + ", " + startY + "]");
             
-            // TODO: Don't generate a bitmap, pass the UInt8ClampedArray to the client instead
-            //image.scan(startX, startY, width, height, function (x, y, idx) {
-            //    // TODO: Make indexing suck less
-            //    this.bitmap.data[idx] = renderResult.bitmap[(y - startY) * width * 3 + (x - startX) * 3];      // R
-            //    this.bitmap.data[idx + 1] = renderResult.bitmap[(y - startY) * width * 3 + (x - startX) * 3 + 1];  // G
-            //    this.bitmap.data[idx + 2] = renderResult.bitmap[(y - startY) * width * 3 + (x - startX) * 3 + 2];  // B
-            //    this.bitmap.data[idx + 3] = 255; // A, use full alpha
-            //});
             
-            log(startY * width * colorSize + startX * colorSize);
-            renderResult.bitmap.copy(image, startY * width * colorSize + startX * colorSize);
-            
-            // TODO: Extract
-            if (jobs.length > 0) {
+            if (manager.hasWork()) {
                 // There are still jobs to process, give the worker a new one
-                let newJob = jobs.pop();
-                log(doneJobs.length);
-                log("Sending " + newJob);
+                let newJob = manager.getWork();
                 socket.emit("info", "You will receive a new job shortly");
                 socket.emit("render", newJob);
             }
-            if (doneJobs.length === expectedJobCount) {
-                // All jobs reported back, can render
+            if (manager.workDone()) {
                 outputToClient();
             }
         }
         
         var outputToClient = function () {
-            if (jobs.length !== 0) throw "Invalid job count. Queue should be empty because all responses came back, real queue length was " + jobs.length;
-            if (doneJobs.length !== expectedJobCount) throw "Invalid done jobs count. All jobs must be done before outputing to client";
+            if (manager.hasWork()) throw "Invalid job count. Queue should be empty because all responses came back, real queue length was " + manager.pendingJobCount();
+            if (manager.workDone()) throw "All jobs must be done before outputing to client";
             log("Outputing image to client");
-            clientSocket.emit("rendered-output", { width: width, height: height, buffer: image });
+            clientSocket.emit("rendered-output", imagemaster.getData());
+            // TODO: Manage room
+            pool.forEach(function (socketInfo) { returnToStorage(socketInfo.socket, socketStorage); log("Returned " + socketInfo.socket.id + " to storage"); });
         }
         
         var pool = createPool(workerSockets, socketStorage),
@@ -174,21 +117,20 @@ function distributor(socketServer/* TODO: params */) {
         server.to(roomId).emit("info", "Rendering has been requested");
         
         // Rendering and stuff
-        var jobs = splitWork(width, height);
-        var jobsInProcess = [], // TODO: Use for retry mechanism?
-            doneJobs = [],
-            expectedJobCount = jobs.length;
-        var colorSize = 4; // TODO: Extract this in a common spot
-        var image = new Buffer(width * height * colorSize);
+        var imagemaster = new ImageMaster(width, height),
+            jobs = imagemaster.splitWork(),
+            manager = new JobManager(jobs);
+
         if (jobs.length < pool.length) throw "TODO: Handle case of too much resources";
         
-        if (pool.length >= jobs.length) throw "Pool has " + pool.length + " workers but jobs are only " + jobs.length;
         log("Pool length is " + pool.length + " and job length is " + jobs.length);
+        
+        // Init rendering
         pool.forEach(function (socketInfo) {
-            // TODO: Extract storage to a separate object
-            var job = jobs.pop();
-            //jobsInProcess.push(job);
-            socketInfo.socket.emit("render", job);
+            if (manager.hasWork()) {
+                let job = manager.getWork();
+                socketInfo.socket.emit("render", job);
+            }
         })
     }
     

@@ -36,20 +36,8 @@ var worker = function (url /* TODO: What other params? */) {
         var startY = imageparams.y;
         var colorSize = 4;
         
-        // TODO: Separate concerns and all that fancy stuff
-        // TODO: Check if quaddmg supports RGBA and add support here as well
-        var data = new Buffer(height * width * colorSize);
         
         log("Launching child render");
-        // TODO: Real raytracer (ja-ja-ja)
-        var render = spawn("TestInterop.exe");
-        // Init render
-        render.stdin.write("begin\r\n");
-        render.stdin.write(width + "\r\n");
-        render.stdin.write(height + "\r\n");
-        render.stdin.write(startX + "\r\n");
-        render.stdin.write(startY + "\r\n");
-        // TODO: Do the split and line streaming in one stream instead of piping through split
         var handler = render.stdout.pipe(split());
         handler.on("data", (function () {
             var currentRow = 0;

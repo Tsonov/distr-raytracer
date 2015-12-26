@@ -31,8 +31,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
+    <Compile Include="bin\worker.js" />
     <Compile Include="lib\distributor.js" />
     <Compile Include="lib\helpers.js" />
+    <Compile Include="lib\img-master.js" />
+    <Compile Include="lib\img-slave.js" />
+    <Compile Include="lib\job-manager.js" />
     <Compile Include="lib\worker.js" />
     <Compile Include="public\js\rending.js" />
     <Compile Include="routes\index.js" />
