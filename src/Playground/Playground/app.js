@@ -7,7 +7,7 @@ var Jimp = require("jimp"),
     split = require("split"),
     os = require("os");
 
-var socket = new socketio("http://localhost:3000/worker-ns");
+var socket = new socketio("http://localhost:1337/worker-ns");
 
 // TODO: Library
 var unsignedColorToNums = function (number, hasAlpha) {

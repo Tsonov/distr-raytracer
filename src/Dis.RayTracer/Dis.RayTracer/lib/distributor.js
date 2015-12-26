@@ -7,7 +7,7 @@ var socketio = require('socket.io'),
 /* Exports */
 exports.distributor = distributor;
 
-
+// TODO: Refactor
 function distributor(socketServer/* TODO: params */) {
     var availableSockets = {},
         clientNs = socketServer.of("/client-ns"),    
@@ -25,6 +25,7 @@ function distributor(socketServer/* TODO: params */) {
     
     /* Helper functions */
     function clientSocketConnected(clientSocket) {
+        
         log("Client socket with id " + clientSocket.id + " has joined");
         clientSocket.on("startRendering", startRendering);
         // TODO: More granular?
@@ -34,6 +35,12 @@ function distributor(socketServer/* TODO: params */) {
         })
         
         clientSocket.on("error", log);
+        
+        
+        function startRendering(renderParams /* TODO What parameters should be here? */) {
+            log(renderParams);
+            initRendering(socketServer, clientSocket, renderParams.workers, availableSockets, renderParams.width, renderParams.height);
+        }
     }
     
     function workerSocketConnected(workerSocket) {
@@ -54,9 +61,46 @@ function distributor(socketServer/* TODO: params */) {
         workerSocket.on("error", log);
     }
     
-    function startRendering(renderParams /* TODO What parameters should be here? */) {
-        log(renderParams);
-        initRendering(clientSocket, renderParams.workers, availableSockets, renderParams.width, renderParams.height);
+    var splitWork = function (width, height) {
+        // TODO: Handle cases of various worker length
+        // TODO: Better algorithm
+        var bucketCount = 4;
+        if (height >= bucketCount) {
+            var bucketHeight = Math.floor(height / bucketCount);
+            var result = [];
+            for (var i = 0; i < bucketCount; i++) {
+                // TODO: Splitting only by height for now...so the x and width is constant, only y and height changes
+                result.push({
+                    x: 0, 
+                    y: bucketHeight * i,
+                    width: width,
+                    height: bucketHeight
+                });
+            }
+            // TODO: Floating point comparisons?
+            if (bucketCount * bucketHeight < height) {
+                // Add one more bucket with the leftovers
+                result.push({
+                    x: 0,
+                    y: bucketCount * bucketHeight,
+                    width: width,
+                    height: height - (bucketCount * bucketHeight)// TODO: Check math here
+                })
+            }
+            return result;
+        } else {
+            // TODO: Better algorithm as well
+            var result = [];
+            for (var i = 0; i < height; i++) {
+                result.push({
+                    x: 0,
+                    y: i,
+                    width: width,
+                    height: 1
+                })
+            }
+            return result;
+        }
     }
     
     var createPool = function (socketsToInclude, socketStorage) {
@@ -72,7 +116,7 @@ function distributor(socketServer/* TODO: params */) {
         socketStorage[socket.id] = socket;
     }
     
-    var initRendering = function (clientSocket, workerSockets, socketStorage, width, height) {
+    var initRendering = function (server, clientSocket, workerSockets, socketStorage, width, height) {
         // TODO: Refactor
         var childresponsehandler = function (socket, renderResult) {
             log("Child has rendered a result");
@@ -82,6 +126,7 @@ function distributor(socketServer/* TODO: params */) {
             var startY = renderResult.startY;
             log("Rendered result with width " + width + " and height " + height + " from [" + startX + ", " + startY + "]");
             
+            // TODO: Don't generate a bitmap, pass the UInt8ClampedArray to the client instead
             image.scan(startX, startY, width, height, function (x, y, idx) {
                 // TODO: Make indexing suck less
                 this.bitmap.data[idx] = renderResult.bitmap[(y - startY) * width * 3 + (x - startX) * 3];      // R
@@ -107,7 +152,6 @@ function distributor(socketServer/* TODO: params */) {
             image.getBuffer(Jimp.MIME_BMP, function (err, buffer) {
                 if (err) throw err; // TODO: Log and handle
                 clientSocket.emit("rendered-output", { width: width, height: height, buffer: buffer });
-                server.close();
             });
         }
         

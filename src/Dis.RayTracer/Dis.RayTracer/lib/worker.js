@@ -34,9 +34,11 @@ var worker = function (url /* TODO: What other params? */) {
         var height = imageparams.height;
         var startX = imageparams.x;
         var startY = imageparams.y;
+        var colorSize = 4;
         
         // TODO: Separate concerns and all that fancy stuff
-        var data = new Uint8ClampedArray(height * width * 3);
+        // TODO: Check if quaddmg supports RGBA and add support here as well
+        var data = new Uint8ClampedArray(height * width * colorSize);
         
         log("Launching child render");
         // TODO: Real raytracer (ja-ja-ja)
@@ -59,9 +61,10 @@ var worker = function (url /* TODO: What other params? */) {
                 // TODO: All Debug checks for sizes
                 if (colors.length !== width) throw "Invalid size of colors array " + colors.length + ", expected " + width;
                 for (var x = 0; x < colors.length; x++) {
-                    data[currentRow * width * 3 + x * 3] = colors[x].r;
-                    data[currentRow * width * 3 + x * 3 + 1] = colors[x].g;
-                    data[currentRow * width * 3 + x * 3 + 2] = colors[x].b;
+                    data[currentRow * width * colorSize + x * colorSize] = colors[x].r;
+                    data[currentRow * width * colorSize + x * colorSize + 1] = colors[x].g;
+                    data[currentRow * width * colorSize + x * colorSize + 2] = colors[x].b;
+                    data[currentRow * width * colorSize + x * colorSize + 3] = 255; // Full alpha currently
                 }
                 currentRow++;
             }

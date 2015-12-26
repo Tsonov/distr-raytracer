@@ -11,6 +11,8 @@ block content
             li= val
     input#startRendering(type="button", value="Start rendering")
 
+    canvas#image(width=255, height=510)
+
 block scripts
     script(src='/socket.io/socket.io.js')
     script(src='/js/rending.js')
