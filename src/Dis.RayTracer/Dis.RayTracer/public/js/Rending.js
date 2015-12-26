@@ -11,7 +11,7 @@
                 colorArr = new Uint8ClampedArray(colorBuffer);
             // TODO: Only RGBA-based colors allowed?
             // TODO: Check math
-            // if (colorArr.length !== width * height * 4) throw "Unexpected color array length, expected " + width * height * 4 + " but got " + colorArr.length;
+            if (colorArr.length !== width * height * 4) throw "Unexpected color array length, expected " + width * height * 4 + " but got " + colorArr.length;
             
             img.data.set(colorArr);
             context.putImageData(img, dx, dy);

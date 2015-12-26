@@ -96,3 +96,6 @@ var worker = function (url /* TODO: What other params? */) {
     /* Return */
     return {};
 }
+
+// TODO: Extract
+worker("http://localhost:1337/worker-ns");

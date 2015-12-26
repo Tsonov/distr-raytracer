@@ -1,7 +1,6 @@
 ﻿'use strict'
 var socketio = require('socket.io'),
     http = require('http'),
-    Jimp = require('jimp'),
     log = require('./helpers.js').log;
 
 /* Exports */
@@ -25,7 +24,7 @@ function distributor(socketServer/* TODO: params */) {
     
     /* Helper functions */
     function clientSocketConnected(clientSocket) {
-        
+        // TODO: Fix communication since it's a data race now
         log("Client socket with id " + clientSocket.id + " has joined");
         clientSocket.on("startRendering", startRendering);
         // TODO: More granular?
@@ -119,7 +118,8 @@ function distributor(socketServer/* TODO: params */) {
     var initRendering = function (server, clientSocket, workerSockets, socketStorage, width, height) {
         // TODO: Refactor
         var childresponsehandler = function (socket, renderResult) {
-            log("Child has rendered a result");
+            log("Child " + socket.id + " has rendered a result");
+            doneJobs.push({}); // TODO: Maybe pointless to be an array but fix later....
             var width = renderResult.width;
             var height = renderResult.height;
             var startX = renderResult.startX;
@@ -127,32 +127,42 @@ function distributor(socketServer/* TODO: params */) {
             log("Rendered result with width " + width + " and height " + height + " from [" + startX + ", " + startY + "]");
             
             // TODO: Don't generate a bitmap, pass the UInt8ClampedArray to the client instead
-            image.scan(startX, startY, width, height, function (x, y, idx) {
-                // TODO: Make indexing suck less
-                this.bitmap.data[idx] = renderResult.bitmap[(y - startY) * width * 3 + (x - startX) * 3];      // R
-                this.bitmap.data[idx + 1] = renderResult.bitmap[(y - startY) * width * 3 + (x - startX) * 3 + 1];  // G
-                this.bitmap.data[idx + 2] = renderResult.bitmap[(y - startY) * width * 3 + (x - startX) * 3 + 2];  // B
-                this.bitmap.data[idx + 3] = 255; // A, use full alpha
-            });
+            //image.scan(startX, startY, width, height, function (x, y, idx) {
+            //    // TODO: Make indexing suck less
+            //    this.bitmap.data[idx] = renderResult.bitmap[(y - startY) * width * 3 + (x - startX) * 3];      // R
+            //    this.bitmap.data[idx + 1] = renderResult.bitmap[(y - startY) * width * 3 + (x - startX) * 3 + 1];  // G
+            //    this.bitmap.data[idx + 2] = renderResult.bitmap[(y - startY) * width * 3 + (x - startX) * 3 + 2];  // B
+            //    this.bitmap.data[idx + 3] = 255; // A, use full alpha
+            //});
             
-            expectedResponsesCount--;
+            //log(renderResult.bitmap);
+            image.set(renderResult.bitmap, startY * width * colorSize + startX * colorSize);
+            
             // TODO: Extract
-            if (expectedResponsesCount === 0) {
-                outputToClient();
-            } else {
-                var newJob = jobs.pop();
+            if (jobs.length > 0) {
+                // There are still jobs to process, give the worker a new one
+                let newJob = jobs.pop();
+                log(doneJobs.length);
+                log("Sending " + newJob);
                 socket.emit("info", "You will receive a new job shortly");
                 socket.emit("render", newJob);
+            }
+            if (doneJobs.length === expectedJobCount) {
+                // All jobs reported back, can render
+                outputToClient();
             }
         }
         
         var outputToClient = function () {
             if (jobs.length !== 0) throw "Invalid job count. Queue should be empty because all responses came back, real queue length was " + jobs.length;
+            if (doneJobs.length !== expectedJobCount) throw "Invalid done jobs count. All jobs must be done before outputing to client";
             log("Outputing image to client");
-            image.getBuffer(Jimp.MIME_BMP, function (err, buffer) {
-                if (err) throw err; // TODO: Log and handle
-                clientSocket.emit("rendered-output", { width: width, height: height, buffer: buffer });
-            });
+            //log(image);
+            clientSocket.emit("rendered-output", { width: width, height: height, buffer: image });
+            //image.getBuffer(Jimp.MIME_BMP, function (err, buffer) {
+            //    if (err) throw err; // TODO: Log and handle
+            //    clientSocket.emit("rendered-output", { width: width, height: height, buffer: buffer });
+            //});
         }
         
         var pool = createPool(workerSockets, socketStorage),
@@ -170,12 +180,19 @@ function distributor(socketServer/* TODO: params */) {
         
         // Rendering and stuff
         var jobs = splitWork(width, height);
-        var expectedResponsesCount = jobs.length;
-        var image = new Jimp(width, height, 0x00ff00ff);
+        var jobsInProcess = [], // TODO: Use for retry mechanism?
+            doneJobs = [],
+            expectedJobCount = jobs.length;
+        var colorSize = 4; // TODO: Extract this in a common spot
+        var image = new Uint8ClampedArray(width * height * colorSize);
         if (jobs.length < pool.length) throw "TODO: Handle case of too much resources";
         
+        if (pool.length >= jobs.length) throw "Pool has " + pool.length + " workers but jobs are only " + jobs.length;
+        log("Pool length is " + pool.length + " and job length is " + jobs.length);
         pool.forEach(function (socketInfo) {
+            // TODO: Extract storage to a separate object
             var job = jobs.pop();
+            //jobsInProcess.push(job);
             socketInfo.socket.emit("render", job);
         })
     }
