@@ -135,8 +135,8 @@ function distributor(socketServer/* TODO: params */) {
             //    this.bitmap.data[idx + 3] = 255; // A, use full alpha
             //});
             
-            //log(renderResult.bitmap);
-            image.set(renderResult.bitmap, startY * width * colorSize + startX * colorSize);
+            log(startY * width * colorSize + startX * colorSize);
+            renderResult.bitmap.copy(image, startY * width * colorSize + startX * colorSize);
             
             // TODO: Extract
             if (jobs.length > 0) {
@@ -157,12 +157,7 @@ function distributor(socketServer/* TODO: params */) {
             if (jobs.length !== 0) throw "Invalid job count. Queue should be empty because all responses came back, real queue length was " + jobs.length;
             if (doneJobs.length !== expectedJobCount) throw "Invalid done jobs count. All jobs must be done before outputing to client";
             log("Outputing image to client");
-            //log(image);
             clientSocket.emit("rendered-output", { width: width, height: height, buffer: image });
-            //image.getBuffer(Jimp.MIME_BMP, function (err, buffer) {
-            //    if (err) throw err; // TODO: Log and handle
-            //    clientSocket.emit("rendered-output", { width: width, height: height, buffer: buffer });
-            //});
         }
         
         var pool = createPool(workerSockets, socketStorage),
@@ -184,7 +179,7 @@ function distributor(socketServer/* TODO: params */) {
             doneJobs = [],
             expectedJobCount = jobs.length;
         var colorSize = 4; // TODO: Extract this in a common spot
-        var image = new Uint8ClampedArray(width * height * colorSize);
+        var image = new Buffer(width * height * colorSize);
         if (jobs.length < pool.length) throw "TODO: Handle case of too much resources";
         
         if (pool.length >= jobs.length) throw "Pool has " + pool.length + " workers but jobs are only " + jobs.length;

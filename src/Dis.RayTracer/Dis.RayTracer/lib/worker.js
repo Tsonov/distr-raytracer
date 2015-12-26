@@ -38,7 +38,7 @@ var worker = function (url /* TODO: What other params? */) {
         
         // TODO: Separate concerns and all that fancy stuff
         // TODO: Check if quaddmg supports RGBA and add support here as well
-        var data = new Uint8ClampedArray(height * width * colorSize);
+        var data = new Buffer(height * width * colorSize);
         
         log("Launching child render");
         // TODO: Real raytracer (ja-ja-ja)
