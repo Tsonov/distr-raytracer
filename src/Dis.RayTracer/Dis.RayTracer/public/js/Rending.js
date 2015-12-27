@@ -36,14 +36,14 @@
                 log("Server says:" + message);
             })
             
-            socket.on("rendered-output", function (imageData) {
+            socket.on("rendered-output", function (renderedResult) {
                 log("Received image");
-                log(imageData);
-                if (imageData.width != totalWidth || imageData.height != totalHeight) throw "Unexpected mismatch in dimensions between client and server";
+                log(renderedResult);
+                if (renderedResult.width != totalWidth || renderedResult.height != totalHeight) throw "Unexpected mismatch in dimensions between client and server";
                 // TODO: Refactor
                 
                 var canvas = document.getElementById("image");
-                fillCanvasWithData(canvas, imageData.buffer, totalWidth, totalHeight, 0, 0);
+                fillCanvasWithData(canvas, renderedResult.imageData, totalWidth, totalHeight, 0, 0);
                 log("All done, exiting");
                 socket.close();
             })

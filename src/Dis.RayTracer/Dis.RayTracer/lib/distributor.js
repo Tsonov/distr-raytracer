@@ -80,7 +80,8 @@ function distributor(socketServer/* TODO: params */) {
         var childresponsehandler = function (socket, renderResult) {
             log("Child " + socket.id + " has rendered a result");
             manager.jobDone(renderResult);
-            log("Rendered result with width " + width + " and height " + height + " from [" + startX + ", " + startY + "]");
+            imagemaster.handleResult(renderResult);
+            log("Rendered result with width " + renderResult.width + " and height " + renderResult.height + " from [" + renderResult.dx + ", " + renderResult.dy + "]");
             
             
             if (manager.hasWork()) {
@@ -90,17 +91,22 @@ function distributor(socketServer/* TODO: params */) {
                 socket.emit("render", newJob);
             }
             if (manager.workDone()) {
+                // TODO: This should be triggarable from outside if continous rending will be supported
+                pool.forEach(function (socketInfo) {
+                    socketInfo.socket.emit("end-render");
+                    returnToStorage(socketInfo.socket, socketStorage);
+                    // TODO: Manage room
+                    log("Returned " + socketInfo.socket.id + " to storage after rendering is done");
+                })
                 outputToClient();
             }
         }
         
         var outputToClient = function () {
             if (manager.hasWork()) throw "Invalid job count. Queue should be empty because all responses came back, real queue length was " + manager.pendingJobCount();
-            if (manager.workDone()) throw "All jobs must be done before outputing to client";
+            if (!manager.workDone()) throw "All jobs must be done before outputing to client";
             log("Outputing image to client");
             clientSocket.emit("rendered-output", imagemaster.getData());
-            // TODO: Manage room
-            pool.forEach(function (socketInfo) { returnToStorage(socketInfo.socket, socketStorage); log("Returned " + socketInfo.socket.id + " to storage"); });
         }
         
         var pool = createPool(workerSockets, socketStorage),
@@ -127,6 +133,8 @@ function distributor(socketServer/* TODO: params */) {
         
         // Init rendering
         pool.forEach(function (socketInfo) {
+            // Signal the slave to initialize itself
+            socketInfo.socket.emit("init-render")
             if (manager.hasWork()) {
                 let job = manager.getWork();
                 socketInfo.socket.emit("render", job);

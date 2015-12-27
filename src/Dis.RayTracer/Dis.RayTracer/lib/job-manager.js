@@ -5,8 +5,9 @@ function JobStore(jobs) {
     if (!(this instanceof JobStore))
         return new JobStore();
     
-    this.pendingJobs = [];
-    jobs.forEach(Array.prototype.push.bind(this.pendingJobs));
+    this.pendingJobs = jobs.slice(0);
+    console.log(JSON.stringify(this.pendingJobs));
+    console.log(this.pendingJobs.length);
     this.results = [];
     this.expectedJobsToFinish = this.pendingJobs.length;
 }

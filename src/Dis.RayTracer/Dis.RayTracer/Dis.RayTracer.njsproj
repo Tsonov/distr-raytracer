@@ -37,12 +37,11 @@
     <Compile Include="lib\img-master.js" />
     <Compile Include="lib\img-slave.js" />
     <Compile Include="lib\job-manager.js" />
-    <Compile Include="lib\worker.js" />
     <Compile Include="public\js\rending.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\users.js" />
     <Compile Include="bin\www" />
-    <Content Include="lib\TestInterop.exe" />
+    <Content Include="bin\TestInterop.exe" />
     <Content Include="package.json" />
     <Content Include="public\stylesheets\style.styl" />
     <Content Include="README.md" />

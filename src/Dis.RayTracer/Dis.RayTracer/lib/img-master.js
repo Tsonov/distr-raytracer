@@ -1,4 +1,5 @@
-﻿
+﻿'use strict'
+
 module.exports = exports = ImageMaster;
 
 function ImageMaster(width, height) {
@@ -52,13 +53,13 @@ ImageMaster.prototype.splitWork = function () {
 }
 
 ImageMaster.prototype.handleResult = function (renderedResult) {
-    var blockWidth = renderResult.width,
-        blockHeight = renderResult.height,
-        startX = renderResult.startX,
-        startY = renderResult.startY;
+    var blockWidth = renderedResult.width,
+        blockHeight = renderedResult.height,
+        dx = renderedResult.dx,
+        dy = renderedResult.dy;
     
     // TODO: Double-check math here
-    renderResult.bitmap.copy(this.image, startY * blockWidth * ImageMaster.COLOR_SIZE + startX * ImageMaster.COLOR_SIZE);
+    renderedResult.bitmap.copy(this.image, dy * blockWidth * ImageMaster.COLOR_SIZE + dx * ImageMaster.COLOR_SIZE);
 }
 
 ImageMaster.prototype.getData = function () {
