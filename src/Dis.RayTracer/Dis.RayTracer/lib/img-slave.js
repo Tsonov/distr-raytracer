@@ -36,7 +36,6 @@ ImageSlave.prototype.render = function (width, height, dx, dy) {
     handler = createStdOutHandler(data, width, height, function () {
         // Detach stdout once rendering is done
         processOut.removeListener("data", handler);
-        console.log(data);
         
         // Report the result
         var renderResult = {

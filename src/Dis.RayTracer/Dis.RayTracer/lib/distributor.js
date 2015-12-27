@@ -12,7 +12,8 @@ exports.distributor = distributor;
 function distributor(socketServer/* TODO: params */) {
     var availableSockets = {},
         clientNs = socketServer.of("/client-ns"),    
-        workerNs = socketServer.of("/worker-ns");
+        workerNs = socketServer.of("/worker-ns"),
+        clientRoom = "clientSockets";
     
     
     /* Initialization */
@@ -28,15 +29,20 @@ function distributor(socketServer/* TODO: params */) {
     function clientSocketConnected(clientSocket) {
         // TODO: Fix communication since it's a data race now
         log("Client socket with id " + clientSocket.id + " has joined");
+        clientSocket.join(clientRoom);
         clientSocket.on("startRendering", startRendering);
+        var socketIds = Object.getOwnPropertyNames(availableSockets);
+        for (let i = 0; i < socketIds.length; i++) {
+            var worker = availableSockets[socketIds[i]];
+            clientSocket.emit("worker-added", { id: worker.socket.id, info: worker.info });
+        };
+        
         // TODO: More granular?
-        clientSocket.emit("available-workers", Object.getOwnPropertyNames(availableSockets));
         clientSocket.on("disconnect", function () {
             log("Client socket with id " + clientSocket.id + " has disconnected");
         })
         
         clientSocket.on("error", log);
-        
         
         function startRendering(renderParams /* TODO What parameters should be here? */) {
             log(renderParams);
@@ -46,7 +52,7 @@ function distributor(socketServer/* TODO: params */) {
     
     function workerSocketConnected(workerSocket) {
         log("Socket with id " + workerSocket.id + " has connected");
-        availableSockets[workerSocket.id] = { socket: workerSocket, info: {} };
+        addToStorage(workerSocket, availableSockets);
         
         workerSocket.emit("info", "You have connected successfully. Please introduce yourself.");
         workerSocket.on("introduce", function (introduceData) {
@@ -55,8 +61,9 @@ function distributor(socketServer/* TODO: params */) {
         })
         
         workerSocket.on("disconnect", function () {
+            // TODO: This is not nearly robust enough...
             log("Socket with id " + workerSocket.id + " has disconnected");
-            delete availableSockets[workerSocket.id];
+            takeFromStorage(workerSocket, availableSockets);
         });
         
         workerSocket.on("error", log);
@@ -64,15 +71,24 @@ function distributor(socketServer/* TODO: params */) {
     
     var createPool = function (socketsToInclude, socketStorage) {
         var pool = socketsToInclude.map(function (socketId) {
-            var result = socketStorage[socketId];
-            delete socketStorage[socketId];
-            return result;
+            return takeFromStorage(socketId, socketStorage);
         });
         return pool;
     }
     
-    var returnToStorage = function (socket, socketStorage) {
-        socketStorage[socket.id] = socket;
+    // TODO: Make consistent across functions
+    // TODO: Validation for existance ?
+    var takeFromStorage = function (socketId, socketStorage) {
+        var worker = socketStorage[socketId];
+        delete socketStorage[socketId];
+        clientNs.emit("worker-removed", { id: worker.socket.id, info: worker.info });
+        return worker;
+    }
+    
+    var addToStorage = function (socket, socketStorage) {
+        socketStorage[socket.id] = { socket: socket, info: {} };
+        // TODO: Fix protocol for introduction and data transfer
+        clientNs.emit("worker-added", { id: socket.id, info: "none yet" });
     }
     
     var initRendering = function (server, clientSocket, workerSockets, socketStorage, width, height) {
@@ -94,7 +110,7 @@ function distributor(socketServer/* TODO: params */) {
                 // TODO: This should be triggarable from outside if continous rending will be supported
                 pool.forEach(function (socketInfo) {
                     socketInfo.socket.emit("end-render");
-                    returnToStorage(socketInfo.socket, socketStorage);
+                    addToStorage(socketInfo.socket, socketStorage);
                     // TODO: Manage room
                     log("Returned " + socketInfo.socket.id + " to storage after rendering is done");
                 })
@@ -126,7 +142,7 @@ function distributor(socketServer/* TODO: params */) {
         var imagemaster = new ImageMaster(width, height),
             jobs = imagemaster.splitWork(),
             manager = new JobManager(jobs);
-
+        
         if (jobs.length < pool.length) throw "TODO: Handle case of too much resources";
         
         log("Pool length is " + pool.length + " and job length is " + jobs.length);

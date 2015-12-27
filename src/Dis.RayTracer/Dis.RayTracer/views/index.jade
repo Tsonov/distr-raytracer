@@ -7,12 +7,11 @@ block content
         p.
             Loading data from the server...
     ul#workers
-        each val in nodes
-            li= val
     input#startRendering(type="button", value="Start rendering")
 
     canvas#image(width=255, height=510)
 
 block scripts
     script(src='/socket.io/socket.io.js')
+    script(src='https://code.jquery.com/jquery-2.1.4.min.js')
     script(src='/js/rending.js')
