@@ -32,8 +32,8 @@ socket.on("render", function (imageparams) {
     log("Rendering for params: " + JSON.stringify(imageparams));
     var width = imageparams.width;
     var height = imageparams.height;
-    var startX = imageparams.x;
-    var startY = imageparams.y;
+    var startX = imageparams.dx;
+    var startY = imageparams.dy;
     
     worker.render(width, height, startX, startY);
 })

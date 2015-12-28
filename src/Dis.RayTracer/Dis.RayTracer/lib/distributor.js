@@ -96,15 +96,15 @@ function distributor(socketServer/* TODO: params */) {
         var childresponsehandler = function (socket, renderResult) {
             log("Child " + socket.id + " has rendered a result");
             manager.jobDone(renderResult);
-            imagemaster.handleResult(renderResult);
-            log("Rendered result with width " + renderResult.width + " and height " + renderResult.height + " from [" + renderResult.dx + ", " + renderResult.dy + "]");
-            
+            clientSocket.emit("rendered-output", renderResult);
+            //imagemaster.handleResult(renderResult);
             
             if (manager.hasWork()) {
                 // There are still jobs to process, give the worker a new one
                 let newJob = manager.getWork();
                 socket.emit("info", "You will receive a new job shortly");
                 socket.emit("render", newJob);
+                clientSocket.emit("rendering-block", newJob);
             }
             if (manager.workDone()) {
                 // TODO: This should be triggarable from outside if continous rending will be supported
@@ -113,6 +113,7 @@ function distributor(socketServer/* TODO: params */) {
                     addToStorage(socketInfo.socket, socketStorage);
                     // TODO: Manage room
                     log("Returned " + socketInfo.socket.id + " to storage after rendering is done");
+                    // TODO: Remove event handler
                 })
                 outputToClient();
             }
@@ -121,8 +122,8 @@ function distributor(socketServer/* TODO: params */) {
         var outputToClient = function () {
             if (manager.hasWork()) throw "Invalid job count. Queue should be empty because all responses came back, real queue length was " + manager.pendingJobCount();
             if (!manager.workDone()) throw "All jobs must be done before outputing to client";
-            log("Outputing image to client");
-            clientSocket.emit("rendered-output", imagemaster.getData());
+            log("Rendering done");
+            clientSocket.emit("render-finished", {});
         }
         
         var pool = createPool(workerSockets, socketStorage),
@@ -154,6 +155,7 @@ function distributor(socketServer/* TODO: params */) {
             if (manager.hasWork()) {
                 let job = manager.getWork();
                 socketInfo.socket.emit("render", job);
+                clientSocket.emit("rendering-block", job);
             }
         })
     }

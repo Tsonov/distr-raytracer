@@ -22,8 +22,8 @@ ImageMaster.prototype.splitWork = function () {
         for (let i = 0; i < bucketCount; i++) {
             // TODO: Splitting only by height for now...so the x and width is constant, only y and height changes
             result.push({
-                x: 0, 
-                y: bucketHeight * i,
+                dx: 0, 
+                dy: bucketHeight * i,
                 width: this.width,
                 height: bucketHeight
             });
@@ -32,8 +32,8 @@ ImageMaster.prototype.splitWork = function () {
         if (bucketCount * bucketHeight < this.height) {
             // Add one more bucket with the leftovers
             result.push({
-                x: 0,
-                y: bucketCount * bucketHeight,
+                dx: 0,
+                dy: bucketCount * bucketHeight,
                 width: this.width,
                 height: this.height - (bucketCount * bucketHeight) // TODO: Check math here
             })
@@ -42,8 +42,8 @@ ImageMaster.prototype.splitWork = function () {
         // TODO: Better algorithm as well
         for (let i = 0; i < this.height; i++) {
             result.push({
-                x: 0,
-                y: i,
+                dx: 0,
+                dy: i,
                 width: this.width,
                 height: 1
             })
