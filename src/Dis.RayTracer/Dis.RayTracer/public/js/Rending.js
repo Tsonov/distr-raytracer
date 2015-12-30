@@ -101,8 +101,8 @@
 
         renderBtn.onclick = function () {
             // TODO: Make part of the scene data once real raytracer is available
-            var totalWidth = 255;
-            var totalHeight = 255 * 2;
+            var totalWidth = 640;
+            var totalHeight = 480;
             // Clear the canvas in case it was in use
             context.clearRect(0, 0, canvas.width, canvas.height);
             if (selectedWorkers.length === 0) {

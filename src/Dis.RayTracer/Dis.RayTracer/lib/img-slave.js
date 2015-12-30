@@ -3,7 +3,8 @@
 var COLOR_SIZE = require('./img-master.js').COLOR_SIZE,
     spawn = require('child_process').spawn,
     stringToColorNums = require('./helpers.js').stringToColorNums,
-    split = require('split');
+    split = require('split'),
+    log = require('./helpers.js').log;
 
 module.exports = exports = ImageSlave;
 
@@ -18,8 +19,13 @@ function ImageSlave(resultHandler) {
 
 ImageSlave.prototype.init = function () {
     
-    // TODO: Real raytracer (ja-ja-ja)
-    this.rendingProcess = spawn("TestInterop.exe");
+    // Create a copy of env to be nice and avoid overrides
+    var env = Object.create(process.env);
+    // Required to tell SDL to not mess with the stdout and stderr streams and leave them be (duh...)
+    env.SDL_STDIO_REDIRECT = "no";
+    this.rendingProcess = spawn("trinity.exe", 
+        ["-con", "data/lecture7.trinity"], 
+        { stdio: ['pipe', 'pipe', process.stderr], env: env });
 };
 
 ImageSlave.prototype.render = function (width, height, dx, dy) {
@@ -51,6 +57,7 @@ ImageSlave.prototype.render = function (width, height, dx, dy) {
     
     // Init render
     // TODO: Finalize protocol here
+    this.rendingProcess.stdin.on("error", log);
     this.rendingProcess.stdin.write("begin\r\n");
     this.rendingProcess.stdin.write(width + "\r\n");
     this.rendingProcess.stdin.write(height + "\r\n");
@@ -60,21 +67,32 @@ ImageSlave.prototype.render = function (width, height, dx, dy) {
 };
 
 ImageSlave.prototype.close = function () {
-    this.rendingProcess.kill();
+    this.rendingProcess.stdin.write("close\n");
+    // TODO: Force kill?
 }
 
 function createStdOutHandler(data, width, height, finishedCallBack) {
     // TODO: Assumes line-buffering right now, might not be optimal though
     var currentRow = 0,
-        result;
+        result,
+        done = false,
+        started = false;
     
     result = function (line) {
         if (line.length == 0) return; // TODO: Figure if the empty row comes from the library implementation
-        if (line.indexOf("Finished") !== -1) {
-            finishedCallBack();
-            // Bail out early
+        if (line.indexOf("Starting") !== -1) {
+            log("Rending has now begun");
+            started = true;
             return;
         }
+        
+        if (line.indexOf("Finished") !== -1) {
+            log("Rending is done");
+            finishedCallBack();
+            done = true;
+            return;
+        }
+        if (done || !started) return;
         
         // TODO: Figure why is there an extra empty entry at the end
         var colors = line.split(" ").map(stringToColorNums).slice(0, -1);
