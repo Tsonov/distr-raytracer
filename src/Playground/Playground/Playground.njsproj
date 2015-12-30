@@ -12,7 +12,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>934c16c7-09aa-4e82-801e-bffd61998b97</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>socketserv.js</StartupFile>
+    <StartupFile>qdmg\render.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -20,7 +20,7 @@
     <OutputPath>.</OutputPath>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
     <StartWebBrowser>false</StartWebBrowser>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -30,12 +30,94 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="app.js" />
-    <Compile Include="child.js" />
-    <Compile Include="socketserv.js" />
+    <Compile Include="sockets\app.js" />
+    <Compile Include="sockets\child.js" />
+    <Compile Include="sockets\client.js" />
+    <Compile Include="qdmg\render.js" />
+    <Compile Include="sockets\socketserv.js" />
     <Content Include="package.json" />
+    <Content Include="qdmg\data\beer.trinity" />
+    <Content Include="qdmg\data\boxed.trinity" />
+    <Content Include="qdmg\data\cornell\backwall.obj" />
+    <Content Include="qdmg\data\cornell\ceiling.obj" />
+    <Content Include="qdmg\data\cornell\floor.obj" />
+    <Content Include="qdmg\data\cornell\leftwall.obj" />
+    <Content Include="qdmg\data\cornell\Readme.md" />
+    <Content Include="qdmg\data\cornell\rightwall.obj" />
+    <Content Include="qdmg\data\cornell\shortblock.obj" />
+    <Content Include="qdmg\data\cornell\tallblock.obj" />
+    <Content Include="qdmg\data\cornell_box.trinity" />
+    <Content Include="qdmg\data\env\forest\negx.exr" />
+    <Content Include="qdmg\data\env\forest\negy.exr" />
+    <Content Include="qdmg\data\env\forest\negz.exr" />
+    <Content Include="qdmg\data\env\forest\posx.exr" />
+    <Content Include="qdmg\data\env\forest\posy.exr" />
+    <Content Include="qdmg\data\env\forest\posz.exr" />
+    <Content Include="qdmg\data\env\ocean\negx.exr" />
+    <Content Include="qdmg\data\env\ocean\negy.exr" />
+    <Content Include="qdmg\data\env\ocean\negz.exr" />
+    <Content Include="qdmg\data\env\ocean\posx.exr" />
+    <Content Include="qdmg\data\env\ocean\posy.exr" />
+    <Content Include="qdmg\data\env\ocean\posz.exr" />
+    <Content Include="qdmg\data\floor.bmp" />
+    <Content Include="qdmg\data\geom\3pyramid.obj" />
+    <Content Include="qdmg\data\geom\fluid.obj" />
+    <Content Include="qdmg\data\geom\heart.obj" />
+    <Content Include="qdmg\data\geom\leaf.obj" />
+    <Content Include="qdmg\data\geom\newwine.obj" />
+    <Content Include="qdmg\data\geom\teapot_hires.obj" />
+    <Content Include="qdmg\data\geom\teapot_lowres.obj" />
+    <Content Include="qdmg\data\geom\truncated_cube.obj" />
+    <Content Include="qdmg\data\heightfield.trinity" />
+    <Content Include="qdmg\data\hw10\bokeh.trinity" />
+    <Content Include="qdmg\data\hw10\medusa.obj" />
+    <Content Include="qdmg\data\hw12\sphtri.trinity" />
+    <Content Include="qdmg\data\hw9\axe_lo.obj" />
+    <Content Include="qdmg\data\hw9\axe_test.trinity" />
+    <Content Include="qdmg\data\hw9\dragon.obj" />
+    <Content Include="qdmg\data\hw9\dragon.trinity" />
+    <Content Include="qdmg\data\hw9\fig1.obj" />
+    <Content Include="qdmg\data\hw9\fig2.obj" />
+    <Content Include="qdmg\data\hw9\fig3.obj" />
+    <Content Include="qdmg\data\hw9\fig4.obj" />
+    <Content Include="qdmg\data\hw9\fig5.obj" />
+    <Content Include="qdmg\data\hw9\nonconvex.trinity" />
+    <Content Include="qdmg\data\kdtree_test.trinity" />
+    <Content Include="qdmg\data\lecture4.trinity" />
+    <Content Include="qdmg\data\lecture5.trinity" />
+    <Content Include="qdmg\data\lecture6.trinity" />
+    <Content Include="qdmg\data\lecture7.trinity" />
+    <Content Include="qdmg\data\meshes.trinity" />
+    <Content Include="qdmg\data\smallpt.trinity" />
+    <Content Include="qdmg\data\testmesh.trinity" />
+    <Content Include="qdmg\data\texture\heightfield.bmp" />
+    <Content Include="qdmg\data\texture\hf_color.bmp" />
+    <Content Include="qdmg\data\texture\lava.bmp" />
+    <Content Include="qdmg\data\texture\wood.bmp" />
+    <Content Include="qdmg\data\texture\zaphod.bmp" />
+    <Content Include="qdmg\data\texture\zar-bump.bmp" />
+    <Content Include="qdmg\data\texture\zar-texture.bmp" />
+    <Content Include="qdmg\data\truncatedIcosahedron.txt" />
+    <Content Include="qdmg\data\world.bmp" />
+    <Content Include="qdmg\data\zaphod.trinity" />
+    <Content Include="qdmg\SDL.dll" />
+    <Content Include="qdmg\trinity.exe" />
     <Content Include="README.md" />
-    <Content Include="TestInterop.exe" />
+    <Content Include="sockets\TestInterop.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="qdmg\data\" />
+    <Folder Include="qdmg\data\cornell\" />
+    <Folder Include="qdmg\data\env\" />
+    <Folder Include="qdmg\data\env\forest\" />
+    <Folder Include="qdmg\data\env\ocean\" />
+    <Folder Include="qdmg\data\geom\" />
+    <Folder Include="qdmg\data\hw10\" />
+    <Folder Include="qdmg\data\hw12\" />
+    <Folder Include="qdmg\data\hw9\" />
+    <Folder Include="qdmg\data\texture\" />
+    <Folder Include="sockets\" />
+    <Folder Include="qdmg\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
