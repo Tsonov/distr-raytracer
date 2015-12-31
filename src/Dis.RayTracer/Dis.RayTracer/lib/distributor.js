@@ -151,7 +151,7 @@ function distributor(socketServer/* TODO: params */) {
         // Init rendering
         pool.forEach(function (socketInfo) {
             // Signal the slave to initialize itself
-            socketInfo.socket.emit("init-render")
+            socketInfo.socket.emit("init-render", { sceneWidth: width, sceneHeight: height });
             if (manager.hasWork()) {
                 let job = manager.getWork();
                 socketInfo.socket.emit("render", job);

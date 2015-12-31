@@ -48,7 +48,8 @@
             context = canvas.getContext("2d"),
             log = console.log.bind(console),
             selectedWorkers = [],
-            socket;
+            socket,
+            startTime;
         
         // TODO: Fix the hardcoded value
         socket = io("http://localhost:1337/client-ns");
@@ -87,7 +88,7 @@
             context.strokeStyle = 'black';
             context.strokeRect(blockInfo.dx, blockInfo.dy, blockInfo.width, blockInfo.height);
         })
-
+        
         socket.on("rendered-output", function (renderedResult) {
             log("Received a bucket");
             log("Rendered result with width " + renderedResult.width + " and height " + renderedResult.height + " from [" + renderedResult.dx + ", " + renderedResult.dy + "]");
@@ -97,12 +98,16 @@
         
         socket.on("render-finished", function () {
             log("All done, exiting");
+            log("Rending took: " + (new Date().getTime() - startTime) / 1000);
         })
-
+        
         renderBtn.onclick = function () {
-            // TODO: Make part of the scene data once real raytracer is available
-            var totalWidth = 640;
-            var totalHeight = 480;
+            // TODO: Make configurable from screen
+            var totalWidth = 1680;
+            var totalHeight = 1280;
+            // Resize the canvas
+            canvas.width = totalWidth;
+            canvas.height = totalHeight;
             // Clear the canvas in case it was in use
             context.clearRect(0, 0, canvas.width, canvas.height);
             if (selectedWorkers.length === 0) {
@@ -117,7 +122,7 @@
                 workers: workerIds
             };
             socket.emit("startRendering", renderParams);
-            
+            startTime = new Date().getTime();
         }
-        
+
     }());

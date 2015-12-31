@@ -17,9 +17,9 @@ dataHandler = function (renderResult) {
 worker = new Slave(dataHandler);
 
 
-socket.on("init-render", function () {
+socket.on("init-render", function (sceneData) {
     log("Launching child renderer");
-    worker.init();
+    worker.init(sceneData);
     // TODO: Return a stream here that can be piped to the master instead of using callbacks
 });
 

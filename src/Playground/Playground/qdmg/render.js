@@ -22,8 +22,8 @@ var stringToColorNums = function (unsignedAsString) {
     return unsignedColorToNums(parseInt(unsignedAsString, 10));
 }
 
-var width = 640,
-    height = 480,
+var width = 1024,
+    height = 768,
     startX = 0,
     startY = 0,
     data = new Uint8ClampedArray(height * width * 4),
@@ -35,15 +35,19 @@ var env = Object.create(process.env);
 // Required to tell SDL to not mess with the stdout and stderr streams and leave them be (duh...)
 env.SDL_STDIO_REDIRECT = "no";
 var render = spawn(__dirname + "\\trinity.exe", 
-    ["-con", "data/lecture7.trinity"], 
+    ["-con", "data/beer.trinity"], 
     { stdio: ['pipe', 'pipe', process.stderr], env: env });
 // Init render
 render.stdin.on("error", log);
+
+// Write dimensions
+render.stdin.write(width + "\n");
+render.stdin.write(height + "\n");
 render.stdin.write("begin\r\n");
-render.stdin.write(width + "\r\n");
-render.stdin.write(height + "\r\n");
-render.stdin.write(startX + "\r\n");
-render.stdin.write(startY + "\r\n");
+render.stdin.write(width + "\n");
+render.stdin.write(height + "\n");
+render.stdin.write(startX + "\n");
+render.stdin.write(startY + "\n");
 // TODO: Do the split and line streaming in one stream instead of piping through split
 var handler = render.stdout.pipe(split());
 handler.on("data", (function () {

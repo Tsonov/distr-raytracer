@@ -17,15 +17,19 @@ function ImageSlave(resultHandler) {
     this.resultHandler = resultHandler;
 }
 
-ImageSlave.prototype.init = function () {
-    
+ImageSlave.prototype.init = function (sceneDims) {
     // Create a copy of env to be nice and avoid overrides
     var env = Object.create(process.env);
     // Required to tell SDL to not mess with the stdout and stderr streams and leave them be (duh...)
     env.SDL_STDIO_REDIRECT = "no";
     this.rendingProcess = spawn("trinity.exe", 
-        ["-con", "data/lecture7.trinity"], 
+        ["-con", "data/beer.trinity"], 
         { stdio: ['pipe', 'pipe', process.stderr], env: env });
+    // Tell the raytracer the scene dimensions for proper camera calculations
+    this.rendingProcess.stdin.write(sceneDims.sceneWidth + "\n");
+    this.rendingProcess.stdin.write(sceneDims.sceneHeight + "\n");
+    this.rendingProcess.stdin.on("error", log);
+    this.rendingProcess.stdout.on("error", log);
 };
 
 ImageSlave.prototype.render = function (width, height, dx, dy) {
@@ -55,14 +59,12 @@ ImageSlave.prototype.render = function (width, height, dx, dy) {
     });
     processOut.on("data", handler);
     
-    // Init render
-    // TODO: Finalize protocol here
-    this.rendingProcess.stdin.on("error", log);
-    this.rendingProcess.stdin.write("begin\r\n");
-    this.rendingProcess.stdin.write(width + "\r\n");
-    this.rendingProcess.stdin.write(height + "\r\n");
-    this.rendingProcess.stdin.write(dx + "\r\n");
-    this.rendingProcess.stdin.write(dy + "\r\n");
+    // Init rendering
+    this.rendingProcess.stdin.write("begin\n");
+    this.rendingProcess.stdin.write(width + "\n");
+    this.rendingProcess.stdin.write(height + "\n");
+    this.rendingProcess.stdin.write(dx + "\n");
+    this.rendingProcess.stdin.write(dy + "\n");
 
 };
 
@@ -103,7 +105,7 @@ function createStdOutHandler(data, width, height, finishedCallBack) {
             data[currentRow * width * COLOR_SIZE + x * COLOR_SIZE] = colors[x].r;
             data[currentRow * width * COLOR_SIZE + x * COLOR_SIZE + 1] = colors[x].g;
             data[currentRow * width * COLOR_SIZE + x * COLOR_SIZE + 2] = colors[x].b;
-            data[currentRow * width * COLOR_SIZE + x * COLOR_SIZE + 3] = 255; // Full alpha currently, TODO: Make Alpha an option
+            data[currentRow * width * COLOR_SIZE + x * COLOR_SIZE + 3] = 255; // Full alpha, raytracer does not support alpha channel
         }
         currentRow++;
     }

@@ -52,25 +52,5 @@ ImageMaster.prototype.splitWork = function () {
     return result;
 }
 
-ImageMaster.prototype.handleResult = function (renderedResult) {
-    var blockWidth = renderedResult.width,
-        blockHeight = renderedResult.height,
-        dx = renderedResult.dx,
-        dy = renderedResult.dy;
-    
-    // TODO: Double-check math here
-    renderedResult.bitmap.copy(this.image, dy * blockWidth * ImageMaster.COLOR_SIZE + dx * ImageMaster.COLOR_SIZE);
-}
-
-ImageMaster.prototype.getData = function () {
-    // TODO: instead of creating copies, output directly to users?
-    var imageData = new Buffer(this.image);
-    return {
-        width: this.width,
-        height: this.height,
-        imageData: imageData
-    }
-}
-
 // TODO: Freeze if it should be a const
 ImageMaster.COLOR_SIZE = 4; // RGBA, TODO: Make consistent with the raytracer and handle missing alpha
