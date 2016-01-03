@@ -8,6 +8,7 @@ block content
             Loading data from the server...
     ul#workers
     input#startRendering(type="button", value="Start rendering")
+    input#cancelRendering(type="button", value="Cancel")
 
     canvas#image(width=640, height=480)
 
@@ -15,3 +16,4 @@ block scripts
     script(src='/socket.io/socket.io.js')
     script(src='https://code.jquery.com/jquery-2.1.4.min.js')
     script(src='/js/rending.js')
+    script(src='/js/index.js')

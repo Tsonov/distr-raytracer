@@ -6,24 +6,24 @@ var COLOR_SIZE = require('./img-master.js').COLOR_SIZE,
     split = require('split'),
     log = require('./helpers.js').log;
 
-module.exports = exports = ImageSlave;
+module.exports = exports = Renderer;
 
 // TODO: Make the callback a stream?
-function ImageSlave(resultHandler) {
-    if (!(this instanceof ImageSlave)) return new ImageSlave(dataHandler);
+function Renderer(resultHandler) {
+    if (!(this instanceof Renderer)) return new Renderer(dataHandler);
     
     // TODO: Validations
     this.rendingProcess = null;
     this.resultHandler = resultHandler;
 }
 
-ImageSlave.prototype.init = function (sceneDims) {
+Renderer.prototype.init = function (sceneDims) {
     // Create a copy of env to be nice and avoid overrides
     var env = Object.create(process.env);
     // Required to tell SDL to not mess with the stdout and stderr streams and leave them be (duh...)
     env.SDL_STDIO_REDIRECT = "no";
     this.rendingProcess = spawn("trinity.exe", 
-        ["-con", "data/beer.trinity"], 
+        ["-con", "data/cornell_box.trinity"], 
         { stdio: ['pipe', 'pipe', process.stderr], env: env });
     // Tell the raytracer the scene dimensions for proper camera calculations
     this.rendingProcess.stdin.write(sceneDims.sceneWidth + "\n");
@@ -32,7 +32,7 @@ ImageSlave.prototype.init = function (sceneDims) {
     this.rendingProcess.stdout.on("error", log);
 };
 
-ImageSlave.prototype.render = function (width, height, dx, dy) {
+Renderer.prototype.render = function (width, height, dx, dy) {
     // TODO: Validations
     // TODO: Check if quaddmg supports RGBA and add support here as well
     // Each "render" step is a separate data generation process so data is only relevant inside this method
@@ -68,9 +68,12 @@ ImageSlave.prototype.render = function (width, height, dx, dy) {
 
 };
 
-ImageSlave.prototype.close = function () {
-    this.rendingProcess.stdin.write("close\n");
-    // TODO: Force kill?
+Renderer.prototype.close = function () {
+    // Kill the underlying process to cancel all rendering
+    // Sending a close message is pointless since the raytracer is probably in progress
+    // Also, we are going to kill the process anyway so it can't really do much
+    this.rendingProcess.kill();
+    this.rendingProcess = null;
 }
 
 function createStdOutHandler(data, width, height, finishedCallBack) {

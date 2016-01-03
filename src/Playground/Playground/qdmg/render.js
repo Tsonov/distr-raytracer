@@ -22,8 +22,8 @@ var stringToColorNums = function (unsignedAsString) {
     return unsignedColorToNums(parseInt(unsignedAsString, 10));
 }
 
-var width = 1024,
-    height = 768,
+var width = 640,
+    height = 480,
     startX = 0,
     startY = 0,
     data = new Uint8ClampedArray(height * width * 4),

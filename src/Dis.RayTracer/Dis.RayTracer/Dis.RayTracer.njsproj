@@ -35,8 +35,9 @@
     <Compile Include="lib\distributor.js" />
     <Compile Include="lib\helpers.js" />
     <Compile Include="lib\img-master.js" />
-    <Compile Include="lib\img-slave.js" />
+    <Compile Include="lib\worker-renderer.js" />
     <Compile Include="lib\job-manager.js" />
+    <Compile Include="public\js\index.js" />
     <Compile Include="public\js\rending.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\users.js" />

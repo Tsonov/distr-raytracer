@@ -1,8 +1,7 @@
 ﻿// Shorter version of console.log for lazy people (like the author)
 exports.log = console.log.bind(console);
 
-exports.unsignedColorToNums = 
-unsignedColorToNums = function (number, hasAlpha) {
+exports.unsignedColorToNums = unsignedColorToNums = function (number, hasAlpha) {
     hasAlpha = hasAlpha || false;
     var redShift = hasAlpha ? 24 : 16,
         greenShift = hasAlpha ? 16 : 8,
@@ -17,4 +16,12 @@ unsignedColorToNums = function (number, hasAlpha) {
 
 exports.stringToColorNums = function (unsignedAsString) {
     return unsignedColorToNums(parseInt(unsignedAsString, 10));
+}
+
+exports.curry = function (func) {
+    var originalArgs = Array.prototype.slice.call(arguments, 1);
+    return function () {
+        var currentArgs = Array.prototype.slice.call(arguments, 0);
+        return func.apply(this, originalArgs.concat(currentArgs));
+    }
 }

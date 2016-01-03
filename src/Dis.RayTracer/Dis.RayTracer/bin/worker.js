@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env node
 'use strict'
-var Slave = require("../lib/img-slave.js"),
+var Renderer = require("../lib/worker-renderer.js"),
     os = require("os"),
     log = require('../lib/helpers.js').log,
     wsocket = require("socket.io-client");
@@ -14,7 +14,7 @@ socket = wsocket("http://localhost:1337/worker-ns");
 dataHandler = function (renderResult) {
     socket.emit("render-finished", renderResult);
 }
-worker = new Slave(dataHandler);
+worker = new Renderer(dataHandler);
 
 
 socket.on("init-render", function (sceneData) {
@@ -25,6 +25,11 @@ socket.on("init-render", function (sceneData) {
 
 socket.on("end-render", function () {
     log("Closing child renderer");
+    worker.close();
+})
+
+socket.on("cancel-render", function () {
+    log("Rendering is cancelled by master");
     worker.close();
 })
 
