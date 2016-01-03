@@ -30,19 +30,29 @@
         selectedWorkers.push(workerInfo);
     });
     
-    socket.on("worker-removed", function (workerInfo) {
-        var li = document.getElementById(workerInfo.id);
+    socket.on("worker-removed", function (workerId) {
+        var li = document.getElementById(workerId);
         if (li) {
             li.parentNode.removeChild(li);
         }
         
-        var ix = selectedWorkers.findIndex(function (info) { return info.id === workerInfo.id });
+        var ix = selectedWorkers.findIndex(function (info) { return info.id === workerId });
         if (ix !== -1) {
             selectedWorkers.splice(ix, 1);
-                
         }
     });
     
+    socket.on("worker-introduced", function (workerInfo) {
+        var li = document.getElementById(workerInfo.id),
+            text;
+        // li might have disappeared due to someone starting a render process with it 
+        if (li) {
+            text = document.createTextNode(workerInfo.id + ":" + JSON.stringify(workerInfo.info));
+            while (li.firstChild) li.removeChild(li.firstChild);
+            li.appendChild(text);
+        }
+    });
+
     socket.on("info", function (message) {
         log("Server says:" + message);
     })

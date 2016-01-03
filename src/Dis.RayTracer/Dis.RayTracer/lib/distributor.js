@@ -61,13 +61,13 @@ function distributor(socketServer) {
         
         workerSocket.on("disconnect", function () {
             log("Socket with id " + workerSocket.id + " has disconnected");
-            takeFromStorage(workerSocket);
+            takeFromStorage(workerSocket.id);
         });
         
         workerSocket.on("error", log);
     }
     
-    var createPool = function (socketsToInclude) {
+    function createPool(socketsToInclude) {
         var pool = socketsToInclude.map(takeFromStorage);
         return pool;
     }
@@ -93,7 +93,7 @@ function distributor(socketServer) {
     function workerIntroduced(workerId, data) {
         var worker = availableSockets[workerId];
         worker.info = data;
-        clientNs.emit("worker-introduced", {});
+        clientNs.emit("worker-introduced", { id: worker.socket.id, info: worker.info });
     }
     
     function initRendering(clientSocket, workerSockets, width, height) {
