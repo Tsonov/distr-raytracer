@@ -8,3 +8,28 @@ a {
 #image {
   display: block;
 }
+#debugarea p {
+  font: 12px "Lucida Console", Monaco, monospace;
+  margin-bottom: 5px;
+}
+#workersPanel {
+  padding: 0;
+}
+#workers {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+#workers li {
+  cursor: pointer;
+}
+.worker-os {
+  font-size: 5em;
+  text-align: center;
+}
+.worker-info {
+  font-size: 1.5em;
+}
+.worker-info-part::before {
+  margin-right: 5px;
+}

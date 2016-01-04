@@ -1,19 +1,24 @@
 ﻿extends layout
 
 block content
-  h1= title
-  #main
-    #loading
-        p.
-            Loading data from the server...
-    ul#workers
-    input#startRendering(type="button", value="Start rendering")
-    input#cancelRendering(type="button", value="Cancel")
+  #main.container-fluid
+    div.col-sm-2
+        #workersarea.panel.panel-primary
+            div.panel-heading
+                h2.panel-title= "Available workers"
+            div#workersPanel.panel-body
+                ul#workers
 
-    canvas#image(width=640, height=480)
+    #workarea.col-sm-7
+        h3= title
+        input#startRendering(type="button", value="Start rendering")
+        input#cancelRendering(type="button", value="Cancel")
+
+        canvas#image(width=640, height=480)
+
+    #debugarea.col-sm-3.well
 
 block scripts
     script(src='/socket.io/socket.io.js')
-    script(src='https://code.jquery.com/jquery-2.1.4.min.js')
     script(src='/js/rending.js')
     script(src='/js/index.js')

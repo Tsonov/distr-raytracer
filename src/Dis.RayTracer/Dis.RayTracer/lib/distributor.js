@@ -51,7 +51,7 @@ function distributor(socketServer) {
     
     function workerSocketConnected(workerSocket) {
         log("Socket with id " + workerSocket.id + " has connected");
-        addToStorage({ socket: workerSocket, info: "Pending..." });
+        addToStorage({ socket: workerSocket, info: { cores: "Pending...", platform: "Unknown", hostname: "Pending..." } });
         
         workerSocket.emit("info", "You have connected successfully. Please introduce yourself.");
         workerSocket.on("introduce", function (introduceData) {

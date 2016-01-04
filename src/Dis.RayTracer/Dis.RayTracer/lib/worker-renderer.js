@@ -23,7 +23,7 @@ Renderer.prototype.init = function (sceneDims) {
     // Required to tell SDL to not mess with the stdout and stderr streams and leave them be (duh...)
     env.SDL_STDIO_REDIRECT = "no";
     this.rendingProcess = spawn("trinity.exe", 
-        ["-con", "data/cornell_box.trinity"], 
+        ["-con", "data/hw9/dragon.trinity"], 
         { stdio: ['pipe', 'pipe', process.stderr], env: env });
     // Tell the raytracer the scene dimensions for proper camera calculations
     this.rendingProcess.stdin.write(sceneDims.sceneWidth + "\n");

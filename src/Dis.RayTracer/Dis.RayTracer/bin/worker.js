@@ -47,7 +47,6 @@ socket.on("connect", function () {
     log("Connected successfully");
     var introductoryData = {
         cores: os.cpus().length,
-        totalMemory: os.totalmem(),
         platform: os.platform(),
         hostname: os.hostname()
     };

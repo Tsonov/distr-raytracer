@@ -2,14 +2,67 @@
 
 (function () {
     'use strict'
+    function addDebugMessage(message) {
+        var p = document.createElement("p"),
+            text = document.createTextNode(message);
+        
+        p.appendChild(text);
+        debugArea.appendChild(p);
+    }
+    
+    function getOsClassname(os) {
+        if (os === "win32" || os === "win64") {
+            return "fa-windows";
+        }
+        else if (os === "linux") {
+            return "fa-linux";
+        } else if (os === "darwin") {
+            return "fa-apple";
+        }
+        else {
+            return "fa-question-circle";
+        }
+    }
+    
+    function createWorkerDisplayElement(workerInfo) {
+        var divRoot = document.createElement("div"),
+            divOs = document.createElement("div"),
+            spanOs = document.createElement("span"),
+            divInfo = document.createElement("div"),
+            divCores = document.createElement("div"),
+            spanCores = document.createElement("span"),
+            textCores = document.createTextNode(workerInfo.cores),
+            divName = document.createElement("div"),
+            spanName = document.createElement("span"),
+            textName = document.createTextNode(workerInfo.hostname);
+        
+        divRoot.className = "list-group-item";
+        divOs.className = "worker-os";
+        spanOs.className = "fa " + getOsClassname(workerInfo.platform);
+        divInfo.className = "worker-info";
+        spanCores.className = "fa fa-tachometer worker-info-part";
+        spanName.className = "fa fa-desktop worker-info-part";
+        
+        divRoot.appendChild(divOs);
+        divOs.appendChild(spanOs);
+        divRoot.appendChild(divInfo);
+        divInfo.appendChild(divCores);
+        divCores.appendChild(spanCores);
+        spanCores.appendChild(textCores);
+        divInfo.appendChild(divName);
+        divName.appendChild(spanName);
+        spanName.appendChild(textName);
+        
+        return divRoot;
+    }
     
     /* Assumes socket.io and rending.js */ 
     var renderBtn = document.getElementById("startRendering"),
         cancelBtn = document.getElementById("cancelRendering"),
         workersList = document.getElementById("workers"),
+        debugArea = document.getElementById("debugarea"),
         canvas = document.getElementById("image"),
         context = canvas.getContext("2d"),
-        log = console.log.bind(console),
         selectedWorkers = [],
         socket,
         startTime,
@@ -20,9 +73,9 @@
     
     socket.on("worker-added", function (workerInfo) {
         var li = document.createElement("li"),
-            text = document.createTextNode(workerInfo.id + ":" + JSON.stringify(workerInfo.info)); // TODO: Prettify
+            content = createWorkerDisplayElement(workerInfo.info);
         
-        li.appendChild(text);
+        li.appendChild(content);
         li.id = workerInfo.id;
         workersList.appendChild(li);
         
@@ -44,18 +97,16 @@
     
     socket.on("worker-introduced", function (workerInfo) {
         var li = document.getElementById(workerInfo.id),
-            text;
+            content;
         // li might have disappeared due to someone starting a render process with it 
         if (li) {
-            text = document.createTextNode(workerInfo.id + ":" + JSON.stringify(workerInfo.info));
+            content = createWorkerDisplayElement(workerInfo.info);
             while (li.firstChild) li.removeChild(li.firstChild);
-            li.appendChild(text);
+            li.appendChild(content);
         }
     });
-
-    socket.on("info", function (message) {
-        log("Server says:" + message);
-    })
+    
+    socket.on("info", addDebugMessage);
     
     socket.on("rendering-block", function (blockInfo) {
         // Aesthetics and all
@@ -64,15 +115,16 @@
     })
     
     socket.on("rendered-output", function (renderedResult) {
-        log("Received a bucket");
-        log("Rendered result with width " + renderedResult.width + " and height " + renderedResult.height + " from [" + renderedResult.dx + ", " + renderedResult.dy + "]");
+        addDebugMessage("Received a bucket");
+        addDebugMessage("Rendered result with width " + renderedResult.width + " and height " + renderedResult.height + " from [" + renderedResult.dx + ", " + renderedResult.dy + "]");
         
         fillCanvasWithData(context, renderedResult.bitmap, renderedResult.width, renderedResult.height, renderedResult.dx, renderedResult.dy);
     })
     
     socket.on("render-finished", function () {
-        log("All done, exiting");
-        log("Rending took: " + (new Date().getTime() - startTime) / 1000);
+        addDebugMessage("All done, exiting");
+        addDebugMessage("Rending took: " + (new Date().getTime() - startTime) / 1000);
+        rendering = false;
     })
     
     renderBtn.onclick = function () {
@@ -110,7 +162,9 @@
         if (!rendering) {
             return;
         }
+        addDebugMessage("Rendering is cancelled");
         socket.emit("cancelRendering");
+        context.clearRect(0, 0, canvas.width, canvas.height);
         rendering = false;
     }
 }());

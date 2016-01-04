@@ -71,7 +71,7 @@ Mesh dragon {
 }
 
 Phong white {
-	color (0.7, 0.7, 0.7)
+	color (0.0, 0.7, 0.0)
 	exponent 133
 }
 
