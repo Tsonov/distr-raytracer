@@ -153,6 +153,9 @@
             height: totalHeight,
             workers: workerIds
         };
+        addDebugMessage("Rendering an image with size [" 
+            + renderParams.width + ", " + renderParams.height + "] with " 
+            + renderParams.workers.length + " workers");
         socket.emit("startRendering", renderParams);
         startTime = new Date().getTime();
         rendering = true;

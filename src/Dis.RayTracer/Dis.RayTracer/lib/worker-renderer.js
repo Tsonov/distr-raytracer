@@ -2,6 +2,7 @@
 'use strict'
 var COLOR_SIZE = require('./img-master.js').COLOR_SIZE,
     spawn = require('child_process').spawn,
+    os = require('os'),
     stringToColorNums = require('./helpers.js').stringToColorNums,
     split = require('split'),
     log = require('./helpers.js').log;
@@ -26,8 +27,8 @@ Renderer.prototype.init = function (sceneDims) {
         ["-con", "data/hw9/dragon.trinity"], 
         { stdio: ['pipe', 'pipe', process.stderr], env: env });
     // Tell the raytracer the scene dimensions for proper camera calculations
-    this.rendingProcess.stdin.write(sceneDims.sceneWidth + "\n");
-    this.rendingProcess.stdin.write(sceneDims.sceneHeight + "\n");
+    this.rendingProcess.stdin.write(sceneDims.sceneWidth + os.EOL);
+    this.rendingProcess.stdin.write(sceneDims.sceneHeight + os.EOL);
     this.rendingProcess.stdin.on("error", log);
     this.rendingProcess.stdout.on("error", log);
 };
@@ -60,11 +61,11 @@ Renderer.prototype.render = function (width, height, dx, dy) {
     processOut.on("data", handler);
     
     // Init rendering
-    this.rendingProcess.stdin.write("begin\n");
-    this.rendingProcess.stdin.write(width + "\n");
-    this.rendingProcess.stdin.write(height + "\n");
-    this.rendingProcess.stdin.write(dx + "\n");
-    this.rendingProcess.stdin.write(dy + "\n");
+    this.rendingProcess.stdin.write("begin" + os.EOL);
+    this.rendingProcess.stdin.write(width + os.EOL);
+    this.rendingProcess.stdin.write(height + os.EOL);
+    this.rendingProcess.stdin.write(dx + os.EOL);
+    this.rendingProcess.stdin.write(dy + os.EOL);
 
 };
 
