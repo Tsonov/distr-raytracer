@@ -2,21 +2,27 @@
 
 block content
   #main.container-fluid
-    div.col-sm-2
+    div.col-md-2
         #workersarea.panel.panel-primary
             div.panel-heading
                 h2.panel-title= "Available workers"
             div#workersPanel.panel-body
                 ul#workers
 
-    #workarea.col-sm-7
+    #workarea.col-md-8
         h3= title
-        input#startRendering(type="button", value="Start rendering")
-        input#cancelRendering(type="button", value="Cancel")
+        div#commands
+            input#width(type='range', min='20', max='1200', step='20', value='640', name='width')
+            input#widthTxt(type='text', disabled='true')
+            input#height(type='range', min='20', max='1200', step='20', value='480')
+            input#heightTxt(type='text', disabled='true')
+            br
+            input#startRendering(type="button", value="Start rendering")
+            input#cancelRendering(type="button", value="Cancel")
 
         canvas#image(width=640, height=480)
 
-    #debugarea.col-sm-3.well
+    #debugarea.col-md-2.well
 
 block scripts
     script(src='/socket.io/socket.io.js')

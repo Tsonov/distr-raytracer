@@ -52,6 +52,7 @@ function distributor(socketServer) {
     function workerSocketConnected(workerSocket) {
         log("Socket with id " + workerSocket.id + " has connected");
         addToStorage({ socket: workerSocket, info: { cores: "Pending...", platform: "Unknown", hostname: "Pending..." } });
+        clientNs.emit("worker-added", { id: workerSocket.id, info: { cores: "Pending...", platform: "Unknown", hostname: "Pending..." } });
         
         workerSocket.emit("info", "You have connected successfully. Please introduce yourself.");
         workerSocket.on("introduce", function (introduceData) {
@@ -62,6 +63,7 @@ function distributor(socketServer) {
         workerSocket.on("disconnect", function () {
             log("Socket with id " + workerSocket.id + " has disconnected");
             takeFromStorage(workerSocket.id);
+            clientNs.emit("worker-removed", workerSocket.id);
         });
         
         workerSocket.on("error", log);
@@ -107,7 +109,7 @@ function distributor(socketServer) {
         var pool = createPool(workerSockets, clientSocket),
             master;
         
-
+        
         // Hook up for cancellation
         clientSocket.on("cancelRendering", cancelRendering);
         

@@ -74,10 +74,20 @@
         return divRoot;
     }
     
+    function createDimensionEventHandler(dimensionTxtControl, dimensionName) {
+        return function () {
+            dimensionTxtControl.value = dimensionName + ":" + this.value;
+        }
+    }
+
     /* Assumes socket.io and rending.js */ 
     var renderBtn = document.getElementById("startRendering"),
         cancelBtn = document.getElementById("cancelRendering"),
         workersList = document.getElementById("workers"),
+        widthRange = document.getElementById("width"),
+        widthTxtbox = document.getElementById("widthTxt"),
+        heightRange = document.getElementById("height"),
+        heightTxtbox = document.getElementById("heightTxt"),
         debugArea = document.getElementById("debugarea"),
         canvas = document.getElementById("image"),
         context = canvas.getContext("2d"),
@@ -85,6 +95,10 @@
         socket,
         startTime,
         rendering = false;
+    
+    // Set initial values
+    widthTxtbox.value = "Width:" + widthRange.value;
+    heightTxtbox.value = "Height:" + heightRange.value;
     
     // TODO: Fix the hardcoded value
     socket = io("http://localhost:1337/client-ns");
@@ -151,9 +165,8 @@
             return;
         }
         
-        // TODO: Make configurable from screen
-        var totalWidth = 640;
-        var totalHeight = 480;
+        var totalWidth = parseInt(widthRange.value, 10);
+        var totalHeight = parseInt(heightRange.value, 10);
         // Resize the canvas
         canvas.width = totalWidth;
         canvas.height = totalHeight;
@@ -187,4 +200,12 @@
         context.clearRect(0, 0, canvas.width, canvas.height);
         rendering = false;
     });
+
+    widthRange.addEventListener("input", createDimensionEventHandler(widthTxtbox, "Width"));
+
+    widthRange.addEventListener("change", createDimensionEventHandler(widthTxtbox, "Width"));
+    
+    heightRange.addEventListener("input", createDimensionEventHandler(heightTxtbox, "Height"));
+    
+    heightRange.addEventListener("change", createDimensionEventHandler(heightTxtbox, "Height"));
 }());
