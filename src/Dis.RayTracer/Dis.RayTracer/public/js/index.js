@@ -88,6 +88,7 @@
         widthTxtbox = document.getElementById("widthTxt"),
         heightRange = document.getElementById("height"),
         heightTxtbox = document.getElementById("heightTxt"),
+        scenesDropDown = document.getElementById("scenes"),
         debugArea = document.getElementById("debugarea"),
         canvas = document.getElementById("image"),
         context = canvas.getContext("2d"),
@@ -169,8 +170,10 @@
             alert("You must select at least one worker first");
             return;
         }
-        var totalWidth = parseInt(widthRange.value, 10);
-        var totalHeight = parseInt(heightRange.value, 10);
+        var totalWidth = parseInt(widthRange.value, 10),
+            totalHeight = parseInt(heightRange.value, 10),
+            scenePath = scenesDropDown.options[scenesDropDown.selectedIndex].value;
+
         // Resize the canvas
         canvas.width = totalWidth;
         canvas.height = totalHeight;
@@ -182,7 +185,7 @@
             width: totalWidth,
             height: totalHeight,
             workers: workerIds,
-            scenePath: "data/lecture4.trinity"
+            scenePath: scenePath
         };
         addDebugMessage("Rendering an image with size [" 
             + renderParams.width + ", " + renderParams.height + "] with " 

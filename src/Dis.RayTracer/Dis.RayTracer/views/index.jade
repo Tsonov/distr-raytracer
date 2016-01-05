@@ -17,6 +17,10 @@ block content
             input#height(type='range', min='20', max='1200', step='20', value='480')
             input#heightTxt(type='text', disabled='true')
             br
+            select#scenes
+                each scene in scenes.length ? scenes : [{ path: "Invalid", name: "No scenes"}]
+                    option(value=scene.path)= scene.name
+            br
             input#startRendering(type="button", value="Start rendering")
             input#cancelRendering(type="button", value="Cancel")
 
