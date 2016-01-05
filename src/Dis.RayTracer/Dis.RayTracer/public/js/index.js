@@ -165,6 +165,10 @@
             return;
         }
         
+        if (selectedWorkers.length === 0) {
+            alert("You must select at least one worker first");
+            return;
+        }
         var totalWidth = parseInt(widthRange.value, 10);
         var totalHeight = parseInt(heightRange.value, 10);
         // Resize the canvas
@@ -172,10 +176,6 @@
         canvas.height = totalHeight;
         // Clear the canvas in case it was in use
         context.clearRect(0, 0, canvas.width, canvas.height);
-        if (selectedWorkers.length === 0) {
-            alert("You must select at least one worker first");
-            return;
-        }
         var workerIds = selectedWorkers;
         
         var renderParams = {
