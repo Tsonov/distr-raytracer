@@ -67,8 +67,12 @@ function distributor(socketServer) {
         workerSocket.on("error", log);
     }
     
-    function createPool(socketsToInclude) {
-        var pool = socketsToInclude.map(takeFromStorage);
+    function createPool(socketsToInclude, renderClient) {
+        var pool = socketsToInclude.map(function (socketId) {
+            // Notify all other clients to remove the worker from their lists
+            renderClient.broadcast.to(clientRoom).emit("worker-removed", socketId);
+            return takeFromStorage(socketId);
+        });
         return pool;
     }
     
@@ -81,13 +85,11 @@ function distributor(socketServer) {
         }
         
         delete availableSockets[socketId];
-        clientNs.emit("worker-removed", socketId);
         return worker;
     }
     
     function addToStorage(socketInfo) {
         availableSockets[socketInfo.socket.id] = socketInfo;
-        clientNs.emit("worker-added", { id: socketInfo.socket.id, info: socketInfo.info });
     }
     
     function workerIntroduced(workerId, data) {
@@ -102,15 +104,17 @@ function distributor(socketServer) {
             master.cancel();
         }
         
-        var pool = createPool(workerSockets),
+        var pool = createPool(workerSockets, clientSocket),
             master;
         
+
         // Hook up for cancellation
         clientSocket.on("cancelRendering", cancelRendering);
         
         master = new ImageMaster(width, height, pool, clientSocket, function () {
             pool.forEach(function (workerInfo) {
                 addToStorage(workerInfo, availableSockets);
+                clientSocket.broadcast.to(clientRoom).emit("worker-added", { id: workerInfo.socket.id, info: workerInfo.info })
             });
             
             // Unhook the handler to avoid double calls

@@ -24,6 +24,24 @@
         }
     }
     
+    function workerClickHandler() {
+        var content = this.firstChild;
+        var ix = findIndexSelectedWorker(this.id);
+        if (ix !== -1) {
+            // This worker was selected, de-select and remove from list
+            selectedWorkers.splice(ix, 1);
+            content.className = "list-group-item";
+        } else {
+            // Select the worker
+            selectedWorkers.push(this.id);
+            content.className = content.className + " active";
+        }
+    }
+    
+    function findIndexSelectedWorker(workerId) {
+        return selectedWorkers.findIndex(function (id) { return id === workerId });
+    }
+    
     function createWorkerDisplayElement(workerInfo) {
         var divRoot = document.createElement("div"),
             divOs = document.createElement("div"),
@@ -79,8 +97,7 @@
         li.id = workerInfo.id;
         workersList.appendChild(li);
         
-        // TODO: Make truly selectable
-        selectedWorkers.push(workerInfo);
+        li.addEventListener("click", workerClickHandler);
     });
     
     socket.on("worker-removed", function (workerId) {
@@ -89,7 +106,7 @@
             li.parentNode.removeChild(li);
         }
         
-        var ix = selectedWorkers.findIndex(function (info) { return info.id === workerId });
+        var ix = findIndexSelectedWorker(workerId);
         if (ix !== -1) {
             selectedWorkers.splice(ix, 1);
         }
@@ -127,7 +144,7 @@
         rendering = false;
     })
     
-    renderBtn.onclick = function () {
+    renderBtn.addEventListener("click", function () {
         if (rendering) {
             // TODO: Message box
             alert("Already rendering. Cancel first.");
@@ -146,7 +163,7 @@
             alert("You must select at least one worker first");
             return;
         }
-        var workerIds = selectedWorkers.map(function (workerInfo) { return workerInfo.id });
+        var workerIds = selectedWorkers;
         
         var renderParams = {
             width: totalWidth,
@@ -159,9 +176,9 @@
         socket.emit("startRendering", renderParams);
         startTime = new Date().getTime();
         rendering = true;
-    }
+    });
     
-    cancelBtn.onclick = function () {
+    cancelBtn.addEventListener("click", function () {
         if (!rendering) {
             return;
         }
@@ -169,5 +186,5 @@
         socket.emit("cancelRendering");
         context.clearRect(0, 0, canvas.width, canvas.height);
         rendering = false;
-    }
+    });
 }());
