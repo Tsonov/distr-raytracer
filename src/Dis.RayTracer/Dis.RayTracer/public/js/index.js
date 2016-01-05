@@ -181,7 +181,8 @@
         var renderParams = {
             width: totalWidth,
             height: totalHeight,
-            workers: workerIds
+            workers: workerIds,
+            scenePath: "data/lecture4.trinity"
         };
         addDebugMessage("Rendering an image with size [" 
             + renderParams.width + ", " + renderParams.height + "] with " 

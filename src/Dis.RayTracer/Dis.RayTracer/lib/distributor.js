@@ -45,7 +45,7 @@ function distributor(socketServer) {
         
         function startRendering(renderParams) {
             log(renderParams);
-            initRendering(clientSocket, renderParams.workers, renderParams.width, renderParams.height);
+            initRendering(clientSocket, renderParams.workers, renderParams.width, renderParams.height, renderParams.scenePath);
         }
     }
     
@@ -100,7 +100,7 @@ function distributor(socketServer) {
         clientNs.emit("worker-introduced", { id: worker.socket.id, info: worker.info });
     }
     
-    function initRendering(clientSocket, workerSockets, width, height) {
+    function initRendering(clientSocket, workerSockets, width, height, scenePath) {
         function cancelRendering() {
             log("Client " + clientSocket.id + " has cancelled the rendering process");
             master.cancel();
@@ -113,7 +113,7 @@ function distributor(socketServer) {
         // Hook up for cancellation
         clientSocket.on("cancelRendering", cancelRendering);
         
-        master = new ImageMaster(width, height, pool, clientSocket, function () {
+        master = new ImageMaster(width, height, pool, clientSocket, scenePath, function () {
             pool.forEach(function (workerInfo) {
                 addToStorage(workerInfo, availableSockets);
                 clientSocket.broadcast.to(clientRoom).emit("worker-added", { id: workerInfo.socket.id, info: workerInfo.info })

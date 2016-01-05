@@ -6,7 +6,7 @@ var JobManager = require('./job-manager.js'),
 
 module.exports = exports = ImageMaster;
 
-function ImageMaster(width, height, workers, client, doneCallback) {
+function ImageMaster(width, height, workers, client, scenePath, doneCallback) {
     if (!(this instanceof ImageMaster)) return new ImageMaster(width, height);
     
     // TODO: Validations
@@ -14,6 +14,7 @@ function ImageMaster(width, height, workers, client, doneCallback) {
     this.height = height;
     this.workers = workers;
     this.client = client;
+    this.scenePath = scenePath;
     this.doneCallback = doneCallback;
 }
 
@@ -75,7 +76,7 @@ ImageMaster.prototype.start = function () {
         worker.socket.on("render-finished", responseHandler);
 
         // Signal the slave to initialize itself
-        worker.socket.emit("init-render", { sceneWidth: that.width, sceneHeight: that.height });
+        worker.socket.emit("init-render", { sceneWidth: that.width, sceneHeight: that.height, scenePath: that.scenePath });
         
         // Give job if we didn't run out of them while initializing
         if (manager.hasWork()) {

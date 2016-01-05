@@ -18,17 +18,17 @@ function Renderer(resultHandler) {
     this.resultHandler = resultHandler;
 }
 
-Renderer.prototype.init = function (sceneDims) {
+Renderer.prototype.init = function (sceneData) {
     // Create a copy of env to be nice and avoid overrides
     var env = Object.create(process.env);
     // Required to tell SDL to not mess with the stdout and stderr streams and leave them be (duh...)
     env.SDL_STDIO_REDIRECT = "no";
     this.rendingProcess = spawn("trinity.exe", 
-        ["-con", "data/hw9/dragon.trinity"], 
+        ["-con", sceneData.scenePath], 
         { stdio: ['pipe', 'pipe', process.stderr], env: env });
     // Tell the raytracer the scene dimensions for proper camera calculations
-    this.rendingProcess.stdin.write(sceneDims.sceneWidth + os.EOL);
-    this.rendingProcess.stdin.write(sceneDims.sceneHeight + os.EOL);
+    this.rendingProcess.stdin.write(sceneData.sceneWidth + os.EOL);
+    this.rendingProcess.stdin.write(sceneData.sceneHeight + os.EOL);
     this.rendingProcess.stdin.on("error", log);
     this.rendingProcess.stdout.on("error", log);
 };
