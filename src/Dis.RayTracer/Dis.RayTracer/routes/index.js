@@ -1,18 +1,19 @@
 ﻿var express = require('express'),
-    dirs = require('node-dir')
-path = require('path');
+    dirs = require('node-dir'),
+    path = require('path');
 
 var router = express.Router(),
     scenes;
 
 // TODO: Could be better
-dirs.files("raytracer/data/", 'file', function (err, files) {
+var dataDir = "raytracer/data/";
+dirs.files(dataDir, 'file', function (err, files) {
     if (err) throw err;
-    
+
     scenes = files
         .filter(function (file) { return path.extname(file) === '.trinity' })
         .map(function (scenePath) {
-        return { path: path.basename(scenePath), name: path.basename(scenePath, '.trinity') }
+        return { path: path.relative(dataDir, scenePath), name: path.basename(scenePath, '.trinity') }
     });
 });
 
