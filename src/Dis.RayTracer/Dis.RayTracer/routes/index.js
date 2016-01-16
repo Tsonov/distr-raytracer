@@ -1,9 +1,24 @@
-﻿var express = require('express');
-var router = express.Router();
+﻿var express = require('express'),
+    dirs = require('node-dir')
+path = require('path');
+
+var router = express.Router(),
+    scenes;
+
+// TODO: Could be better
+dirs.files("raytracer/data/", 'file', function (err, files) {
+    if (err) throw err;
+    
+    scenes = files
+        .filter(function (file) { return path.extname(file) === '.trinity' })
+        .map(function (scenePath) {
+        return { path: path.basename(scenePath), name: path.basename(scenePath, '.trinity') }
+    });
+});
 
 /* GET home page. */
 router.get('/', function (req, res) {
-    res.render('index', { title: 'Dis.RayTracer', scenes: [{ path: "data/lecture4.trinity", name: "lecture4" }, { path: "data/hw9/nonconvex.trinity", name: "nonconvex" }] });
+    res.render('index', { title: 'Dis.RayTracer', scenes: scenes });
 });
 
 module.exports = router;

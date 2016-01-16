@@ -14,7 +14,7 @@ socket = wsocket("http://localhost:1337/worker-ns");
 dataHandler = function (renderResult) {
     socket.emit("render-finished", renderResult);
 }
-worker = new Renderer(dataHandler);
+worker = new Renderer("../raytracer/bin/trinity.exe", "../raytracer/data", dataHandler);
 
 
 socket.on("init-render", function (sceneData) {

@@ -3,6 +3,7 @@
 var COLOR_SIZE = require('./img-master.js').COLOR_SIZE,
     spawn = require('child_process').spawn,
     os = require('os'),
+    path = require('path'),
     stringToColorNums = require('./helpers.js').stringToColorNums,
     split = require('split'),
     log = require('./helpers.js').log;
@@ -10,22 +11,27 @@ var COLOR_SIZE = require('./img-master.js').COLOR_SIZE,
 module.exports = exports = Renderer;
 
 // TODO: Make the callback a stream?
-function Renderer(resultHandler) {
+function Renderer(pathToExe, pathToData, resultHandler) {
     if (!(this instanceof Renderer)) return new Renderer(dataHandler);
     
     // TODO: Validations
     this.rendingProcess = null;
+    this.pathToExe = path.resolve(pathToExe);
+    this.pathToData = path.resolve(pathToData);
     this.resultHandler = resultHandler;
 }
 
 Renderer.prototype.init = function (sceneData) {
+    log(this.pathToData);
+    log(this.pathToExe);
+    log(sceneData.scenePath);
     // Create a copy of env to be nice and avoid overrides
     var env = Object.create(process.env);
     // Required to tell SDL to not mess with the stdout and stderr streams and leave them be (duh...)
     env.SDL_STDIO_REDIRECT = "no";
-    this.rendingProcess = spawn("trinity.exe", 
+    this.rendingProcess = spawn(this.pathToExe, 
         ["-con", sceneData.scenePath], 
-        { stdio: ['pipe', 'pipe', process.stderr], env: env });
+        { stdio: ['pipe', 'pipe', process.stderr], env: env, cwd: this.pathToData });
     // Tell the raytracer the scene dimensions for proper camera calculations
     this.rendingProcess.stdin.write(sceneData.sceneWidth + os.EOL);
     this.rendingProcess.stdin.write(sceneData.sceneHeight + os.EOL);
