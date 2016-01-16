@@ -1,0 +1,14 @@
+{
+  "name": "Dis.RayTracer.Worker",
+  "version": "0.0.0",
+  "description": "Dis.RayTracer.Worker",
+  "main": "app.js",
+  "author": {
+    "name": "fmiuser",
+    "email": ""
+  },
+  "dependencies": {
+    "socket.io-client": "^1.4.4",
+    "split": "^1.0.0"
+  }
+}

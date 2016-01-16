@@ -1,8 +1,8 @@
 ﻿#!/usr/bin/env node
 'use strict'
-var Renderer = require("../lib/worker-renderer.js"),
+var Renderer = require('./lib/worker-renderer.js'),
     os = require("os"),
-    log = require('../lib/helpers.js').log,
+    log = require('./lib/helpers.js').log,
     wsocket = require("socket.io-client");
 
 var socket,

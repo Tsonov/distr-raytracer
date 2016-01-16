@@ -31,12 +31,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
-    <Compile Include="bin\worker.js" />
     <Compile Include="lib\distributor.js" />
     <Compile Include="lib\helpers.js" />
     <Compile Include="lib\img-master.js" />
     <Compile Include="lib\scene-parser.js" />
-    <Compile Include="lib\worker-renderer.js" />
     <Compile Include="lib\job-manager.js" />
     <Compile Include="public\js\bootstrap\bootstrap.js" />
     <Compile Include="public\js\bootstrap\bootstrap.min.js" />
@@ -109,8 +107,6 @@
     <Content Include="raytracer\data\truncatedIcosahedron.txt" />
     <Content Include="raytracer\data\world.bmp" />
     <Content Include="raytracer\data\zaphod.trinity" />
-    <Content Include="raytracer\bin\SDL.dll" />
-    <Content Include="raytracer\bin\trinity.exe" />
     <Content Include="package.json" />
     <Content Include="public\stylesheets\bootstrap\bootstrap-theme.css" />
     <Content Include="public\stylesheets\bootstrap\bootstrap-theme.css.map" />
@@ -162,7 +158,6 @@
     <Folder Include="public\stylesheets\fonts\" />
     <Folder Include="public\stylesheets\font-awesome\" />
     <Folder Include="raytracer\data\" />
-    <Folder Include="raytracer\bin\" />
     <Folder Include="routes\" />
     <Folder Include="views\" />
   </ItemGroup>

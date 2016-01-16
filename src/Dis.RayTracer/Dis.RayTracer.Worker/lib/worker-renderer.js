@@ -1,7 +1,5 @@
-﻿// TODO: Separate link
-'use strict'
-var COLOR_SIZE = require('./img-master.js').COLOR_SIZE,
-    spawn = require('child_process').spawn,
+﻿'use strict'
+var spawn = require('child_process').spawn,
     os = require('os'),
     path = require('path'),
     stringToColorNums = require('./helpers.js').stringToColorNums,
@@ -9,6 +7,9 @@ var COLOR_SIZE = require('./img-master.js').COLOR_SIZE,
     log = require('./helpers.js').log;
 
 module.exports = exports = Renderer;
+
+// TODO: Extract
+var COLOR_SIZE = 4;
 
 // TODO: Make the callback a stream?
 function Renderer(pathToExe, pathToData, resultHandler) {
