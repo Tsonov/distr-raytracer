@@ -44,7 +44,7 @@ Node floor {
 
 
 Mesh 1 {
-	file "fig1.obj"
+	file "geom/fig1.obj"
 	faceted true
 }
 
@@ -59,7 +59,7 @@ Node 1 {
 }
 /*
 Mesh 2 {
-	file "fig2.obj"
+	file "geom/fig2.obj"
 	faceted true
 }
 
@@ -74,7 +74,7 @@ Node 2 {
 }
 
 Mesh 3 {
-	file "fig3.obj"
+	file "geom/fig3.obj"
 	faceted true
 }
 
@@ -89,7 +89,7 @@ Node 3 {
 }
 
 Mesh 4 {
-	file "fig4.obj"
+	file "geom/fig4.obj"
 	faceted true
 }
 
@@ -104,7 +104,7 @@ Node 4 {
 }
 
 Mesh 5 {
-	file "fig5.obj"
+	file "geom/fig5.obj"
 	faceted true
 }
 

@@ -1,20 +1,19 @@
 ﻿var express = require('express'),
-    dirs = require('node-dir'),
+    fs = require('fs'),
     path = require('path');
 
 var router = express.Router(),
+    // TODO: Could be better
+    scenesDir = "raytracer/data/",
     scenes;
 
-// TODO: Could be better
-var dataDir = "raytracer/data/";
-dirs.files(dataDir, 'file', function (err, files) {
-    if (err) throw err;
-
-    scenes = files
-        .filter(function (file) { return path.extname(file) === '.trinity' })
-        .map(function (scenePath) {
-        return { path: path.relative(dataDir, scenePath), name: path.basename(scenePath, '.trinity') }
-    });
+scenes = fs.readdirSync(scenesDir)
+    .filter(function (file) { return path.extname(file) === '.trinity' })
+    .map(function (sceneFile) {
+    return {
+        path: path.join(scenesDir, sceneFile),
+        name: path.basename(sceneFile, '.trinity')
+    }
 });
 
 /* GET home page. */

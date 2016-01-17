@@ -38,31 +38,31 @@ RectLight {
 //////////////////////// GEOMETRIES ////////////////////////////////////////
 
 Mesh mesh_floor {
-	file "cornell/floor.obj"
+	file "geom/cornell/floor.obj"
 }
 
 Mesh mesh_ceiling {
-	file "cornell/ceiling.obj"
+	file "geom/cornell/ceiling.obj"
 }
 
 Mesh mesh_backwall {
-	file "cornell/backwall.obj"
+	file "geom/cornell/backwall.obj"
 }
 
 Mesh mesh_rightwall {
-	file "cornell/rightwall.obj"
+	file "geom/cornell/rightwall.obj"
 }
 
 Mesh mesh_leftwall {
-	file "cornell/leftwall.obj"
+	file "geom/cornell/leftwall.obj"
 }
 
 Mesh mesh_shortblock {
-	file "cornell/shortblock.obj"
+	file "geom/cornell/shortblock.obj"
 }
 
 Mesh mesh_tallblock {
-	file "cornell/tallblock.obj"
+	file "geom/cornell/tallblock.obj"
 }
 
 

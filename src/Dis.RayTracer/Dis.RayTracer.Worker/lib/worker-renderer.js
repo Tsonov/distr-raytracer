@@ -2,8 +2,8 @@
 var spawn = require('child_process').spawn,
     os = require('os'),
     path = require('path'),
-    stringToColorNums = require('./helpers.js').stringToColorNums,
     split = require('split'),
+    stringToColorNums = require('./helpers.js').stringToColorNums,
     log = require('./helpers.js').log;
 
 module.exports = exports = Renderer;
@@ -12,32 +12,40 @@ module.exports = exports = Renderer;
 var COLOR_SIZE = 4;
 
 // TODO: Make the callback a stream?
-function Renderer(pathToExe, pathToData, resultHandler) {
+function Renderer(pathToExe, resultHandler) {
     if (!(this instanceof Renderer)) return new Renderer(dataHandler);
     
     // TODO: Validations
     this.rendingProcess = null;
     this.pathToExe = path.resolve(pathToExe);
-    this.pathToData = path.resolve(pathToData);
     this.resultHandler = resultHandler;
 }
 
-Renderer.prototype.init = function (sceneData) {
-    log(this.pathToData);
-    log(this.pathToExe);
-    log(sceneData.scenePath);
-    // Create a copy of env to be nice and avoid overrides
-    var env = Object.create(process.env);
-    // Required to tell SDL to not mess with the stdout and stderr streams and leave them be (duh...)
-    env.SDL_STDIO_REDIRECT = "no";
-    this.rendingProcess = spawn(this.pathToExe, 
-        ["-con", sceneData.scenePath], 
-        { stdio: ['pipe', 'pipe', process.stderr], env: env, cwd: this.pathToData });
-    // Tell the raytracer the scene dimensions for proper camera calculations
-    this.rendingProcess.stdin.write(sceneData.sceneWidth + os.EOL);
-    this.rendingProcess.stdin.write(sceneData.sceneHeight + os.EOL);
-    this.rendingProcess.stdin.on("error", log);
-    this.rendingProcess.stdout.on("error", log);
+Renderer.prototype.init = function (sceneData, pathToData, readyCallback) {
+    try {
+        // Create a copy of env to be nice and avoid overrides
+        var env = Object.create(process.env);
+        log(this.pathToExe);
+        log(pathToData);
+        // Required to tell SDL to not mess with the stdout and stderr streams and leave them be (duh...)
+        env.SDL_STDIO_REDIRECT = "no";
+        this.rendingProcess = spawn(this.pathToExe, 
+        ["-con", sceneData.sceneName], 
+        {
+            stdio: ['pipe', 'pipe', process.stderr], 
+            env: env, 
+            cwd: pathToData
+        });
+        // Tell the raytracer the scene dimensions for proper camera calculations
+        this.rendingProcess.stdin.on("error", log);
+        this.rendingProcess.stdout.on("error", log);
+        this.rendingProcess.stdin.write(sceneData.sceneWidth + os.EOL);
+        this.rendingProcess.stdin.write(sceneData.sceneHeight + os.EOL);
+
+        readyCallback(null, "Process has been started");
+    } catch (e) {
+        readyCallback(e);
+    };
 };
 
 Renderer.prototype.render = function (width, height, dx, dy) {
@@ -109,7 +117,7 @@ function createStdOutHandler(data, width, height, finishedCallBack) {
         
         // TODO: Figure why is there an extra empty entry at the end
         var colors = line.split(" ").map(stringToColorNums).slice(0, -1);
-
+        
         // TODO: All Debug checks for sizes
         if (colors.length !== width) throw "Invalid size of colors array " + colors.length + ", expected " + width;
         for (let x = 0; x < colors.length; x++) {

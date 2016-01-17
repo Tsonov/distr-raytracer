@@ -29,7 +29,7 @@ Plane floor {
 }
 
 BitmapTexture bmp {
-	file "floor.bmp"
+	file "texture/floor.bmp"
 	scaling 0.005
 }
 
@@ -46,7 +46,7 @@ Node floor {
 
 // Globe sphere:
 BitmapTexture world {
-	file "world.bmp"
+	file "texture/world.bmp"
 }
 
 Lambert globe_shader {

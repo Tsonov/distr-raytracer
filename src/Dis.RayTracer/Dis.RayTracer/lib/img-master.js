@@ -1,6 +1,8 @@
 ﻿'use strict'
 
 var JobManager = require('./job-manager.js'),
+    parseScene = require('./scene-parser.js'),
+    fs = require('fs'),
     curry = require('./helpers.js').curry,
     log = require('./helpers.js').log;
 
@@ -67,22 +69,39 @@ ImageMaster.prototype.start = function () {
     log("Worker length is " + this.workers.length + " and job length is " + jobs.length);
     if (jobs.length < this.workers.length) throw "TODO: Handle case of too much resources";
     
-    this.workers.forEach(function (worker) {
-        var responseHandler = createWorkerHandler(
-            manager, 
-            that.client, 
-            worker.socket, 
-            curry(stopRendering, that.workers, that.doneCallback));
-        worker.socket.on("render-finished", responseHandler);
-
-        // Signal the slave to initialize itself
-        worker.socket.emit("init-render", { sceneWidth: that.width, sceneHeight: that.height, scenePath: that.scenePath });
+    parseScene(this.scenePath, function (err, sceneData) {
+        if (err) throw err;
         
-        // Give job if we didn't run out of them while initializing
-        if (manager.hasWork()) {
-            let job = manager.getWork();
-            giveWork(job, worker.socket, that.client);
-        }
+        that.workers.forEach(function (worker) {
+            var responseHandler = createWorkerHandler(
+                manager, 
+                that.client, 
+                worker.socket, 
+                curry(stopRendering, that.workers, that.doneCallback));
+            
+            var initDoneHandler = function () {
+                var socket = worker.socket;
+                if (manager.hasWork()) {
+                    // Give job if we didn't run out of them while initializing
+                    let newJob = manager.getWork();
+                    giveWork(newJob, socket, that.client);
+                }
+            }
+            
+            // Hook up a handler for done responses
+            worker.socket.on("render-finished", responseHandler);
+            
+            // Hook up the "init" finished handler to start doing work
+            worker.socket.once("init-done", initDoneHandler);
+
+            // Signal the slave to initialize itself
+            worker.socket.emit("init-render", {
+                sceneWidth: that.width, 
+                sceneHeight: that.height,
+                sceneName: sceneData.sceneName, 
+                sceneData: sceneData
+            });
+        });
     });
 }
 
@@ -98,6 +117,7 @@ function stopRendering(workers, doneCallback) {
 function closeWorkers(workers) {
     workers.forEach(function (workerInfo) {
         workerInfo.socket.removeAllListeners("render-finished");
+        workerInfo.socket.removeAllListeners("request-file");
         workerInfo.socket.emit("end-render");
     });
 }
@@ -111,7 +131,7 @@ function workerResultHandler(manager, clientSocket, worker, doneCallBack, result
     log("Child " + worker.id + " has rendered a result");
     manager.jobDone(result);
     clientSocket.emit("rendered-output", result);
-
+    
     if (manager.hasWork()) {
         // There are still jobs to process, give the worker a new one
         let newJob = manager.getWork();

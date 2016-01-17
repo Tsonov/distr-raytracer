@@ -153,7 +153,7 @@ Lambert lambert {
 
 
 BumpTexture bumptex {
-	file "texture/zar-bump.bmp"
+	file "..texture/zar-bump.bmp"
 	strength 15
 }
 

@@ -50,11 +50,11 @@ Node floorNode {
 
 // Axe mesh (relevant to group 2)
 Mesh axe {
-	file               "axe_lo.obj"
+	file               "geom/axe_lo.obj"
 }
 
 Mesh heart {
-	file              "../geom/heart.obj"
+	file              "geom/heart.obj"
 }
 
 Lambert white_flat {
@@ -71,5 +71,5 @@ Node heartNode {
 
 // 5. The cubemap environment:
 CubemapEnvironment environment {
-	folder "../env/forest"
+	folder "env/forest"
 }
