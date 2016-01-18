@@ -79,7 +79,7 @@
             dimensionTxtControl.value = dimensionName + ":" + this.value;
         }
     }
-
+    
     /* Assumes socket.io and rending.js */ 
     var renderBtn = document.getElementById("startRendering"),
         cancelBtn = document.getElementById("cancelRendering"),
@@ -88,6 +88,7 @@
         widthTxtbox = document.getElementById("widthTxt"),
         heightRange = document.getElementById("height"),
         heightTxtbox = document.getElementById("heightTxt"),
+        editLink = document.getElementById("editBtn"),
         scenesDropDown = document.getElementById("scenes"),
         debugArea = document.getElementById("debugarea"),
         canvas = document.getElementById("image"),
@@ -96,10 +97,6 @@
         socket,
         startTime,
         rendering = false;
-    
-    // Set initial values
-    widthTxtbox.value = "Width:" + widthRange.value;
-    heightTxtbox.value = "Height:" + heightRange.value;
     
     // TODO: Fix the hardcoded value
     socket = io("http://localhost:1337/client-ns");
@@ -161,7 +158,6 @@
     
     renderBtn.addEventListener("click", function () {
         if (rendering) {
-            // TODO: Message box
             alert("Already rendering. Cancel first.");
             return;
         }
@@ -173,7 +169,7 @@
         var totalWidth = parseInt(widthRange.value, 10),
             totalHeight = parseInt(heightRange.value, 10),
             scenePath = scenesDropDown.options[scenesDropDown.selectedIndex].value;
-
+        
         // Resize the canvas
         canvas.width = totalWidth;
         canvas.height = totalHeight;
@@ -204,12 +200,25 @@
         context.clearRect(0, 0, canvas.width, canvas.height);
         rendering = false;
     });
-
+    
     widthRange.addEventListener("input", createDimensionEventHandler(widthTxtbox, "Width"));
-
+    
     widthRange.addEventListener("change", createDimensionEventHandler(widthTxtbox, "Width"));
     
     heightRange.addEventListener("input", createDimensionEventHandler(heightTxtbox, "Height"));
     
     heightRange.addEventListener("change", createDimensionEventHandler(heightTxtbox, "Height"));
+    
+    scenesDropDown.addEventListener("change", function () {
+        var value = scenesDropDown.options[scenesDropDown.selectedIndex].value;
+        editLink.setAttribute("href", "/scene?scenePath=" + encodeURIComponent(value));
+    });
+
+    
+    // Set initial values
+    widthTxtbox.value = "Width:" + widthRange.value;
+    heightTxtbox.value = "Height:" + heightRange.value;
+    scenesDropDown.selectedIndex = 0;
+    var value = scenesDropDown.options[scenesDropDown.selectedIndex].value;
+    editLink.setAttribute("href", "/scene?scenePath=" + encodeURIComponent(value));
 }());

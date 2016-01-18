@@ -20,6 +20,7 @@ block content
             select#scenes
                 each scene in scenes.length ? scenes : [{ path: "Invalid", name: "No scenes"}]
                     option(value=scene.path)= scene.name
+            a#editBtn.fa.fa-pencil-square-o(href="#")
             br
             input#startRendering(type="button", value="Start rendering")
             input#cancelRendering(type="button", value="Cancel")

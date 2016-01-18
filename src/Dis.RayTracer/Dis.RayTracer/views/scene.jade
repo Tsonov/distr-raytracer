@@ -1,0 +1,14 @@
+﻿extends layout
+
+block content
+    #main.container-fluid
+        h1= title
+        div.col-xs-12
+            div.edit-commands
+                a#save.fa.fa-floppy-o.scene-save(href="#")= "Save | "
+                a#cancel.fa.fa-ban.scene-cancel(href="/")= "Back"
+            form#sceneForm(action='/save?scenePath=' + scenePath, method='post')
+                textArea#sceneContents.well(name='sceneContents')= contents
+
+block scripts
+    script(src='/js/scene.js')

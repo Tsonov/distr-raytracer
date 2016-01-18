@@ -4,7 +4,8 @@
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
     routes = require('./routes/index'),
-    users = require('./routes/users'),
+    scene = require('./routes/scene'),
+    save = require('./routes/save'),
     socketio = require('socket.io'),
     distributor = require('./lib/distributor.js').distributor,
     http = require('http'),
@@ -30,10 +31,8 @@ app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
-app.use('/socket.io.client.js', function (req, res) {
-    
-});
+app.use('/scene', scene);
+app.use('/save', save);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
