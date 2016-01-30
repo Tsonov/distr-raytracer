@@ -21,43 +21,54 @@ function ImageMaster(width, height, workers, client, scenePath, doneCallback) {
 }
 
 ImageMaster.prototype.splitWork = function () {
-    // TODO: Handle cases of various worker length
-    // TODO: Better algorithm
-    var bucketCount = 4,
+    function clip(width, height, rect) {
+        if (rect.dx > width || rect.dy > height) {
+            throw "Invalid bucket " + JSON.stringify(rect);
+        }
+        
+        if (rect.dx + rect.width > width) {
+            rect.width = width - rect.dx + 1;
+        }
+        if (rect.dy + rect.height > height) {
+            rect.height = height - rect.dy + 1;
+        }
+
+        return rect;
+    }
+
+    var capacityCoef,
+        bucketWidth,
+        bucketHeight,
+        bucketsOnX,
+        bucketsOnY,
         result = [],
-        bucketHeight;
-    if (this.height >= bucketCount) {
-        bucketHeight = Math.floor(this.height / bucketCount);
-        for (let i = 0; i < bucketCount; i++) {
-            // TODO: Splitting only by height for now...so the x and width is constant, only y and height changes
+        clipCurrent = curry(clip, this.width, this.height);
+    
+    // We want to minimize bucket communication as much as possible 
+    // while still leaving some loose ends to account for variable worker capacity
+    // Below is mostly emperical
+    var capacityCoef = this.workers.reduce(function (previous, current) {
+        var cpus = (current.info ? current.info.cores : 1);
+        return previous + cpus;
+    }, 0);
+
+    capacityCoef = Math.max(1, capacityCoef / 2);
+    bucketWidth = (this.width / capacityCoef);
+    bucketHeight = (this.height / capacityCoef);
+    bucketsOnX = Math.ceil((this.width - 1) / (bucketWidth + 1));
+    bucketsOnY = Math.ceil((this.height - 1) / (bucketHeight + 1));
+    for (let y = 0; y < bucketsOnY; y++) {
+        for (let x = 0; x < bucketsOnX; x++) {
             result.push({
-                dx: 0, 
-                dy: bucketHeight * i,
-                width: this.width,
+                dx: x * bucketWidth, 
+                dy: y * bucketHeight,
+                width: bucketWidth,
                 height: bucketHeight
             });
         }
-        // TODO: Floating point comparisons?
-        if (bucketCount * bucketHeight < this.height) {
-            // Add one more bucket with the leftovers
-            result.push({
-                dx: 0,
-                dy: bucketCount * bucketHeight,
-                width: this.width,
-                height: this.height - (bucketCount * bucketHeight) // TODO: Check math here
-            })
-        }
-    } else {
-        // TODO: Better algorithm as well
-        for (let i = 0; i < this.height; i++) {
-            result.push({
-                dx: 0,
-                dy: i,
-                width: this.width,
-                height: 1
-            })
-        }
     }
+    
+    result = result.map(clipCurrent);
     return result;
 }
 
@@ -93,7 +104,7 @@ ImageMaster.prototype.start = function () {
             
             // Hook up the "init" finished handler to start doing work
             worker.socket.once("init-done", initDoneHandler);
-
+            
             // Signal the slave to initialize itself
             worker.socket.emit("init-render", {
                 sceneWidth: that.width, 
