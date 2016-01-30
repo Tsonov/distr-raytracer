@@ -17,6 +17,7 @@ function Renderer(pathToExe, resultHandler) {
     
     // TODO: Validations
     this.rendingProcess = null;
+    this.processOut = null;
     this.pathToExe = path.resolve(pathToExe);
     this.resultHandler = resultHandler;
 }
@@ -41,6 +42,9 @@ Renderer.prototype.init = function (sceneData, pathToData, readyCallback) {
         this.rendingProcess.stdout.on("error", log);
         this.rendingProcess.stdin.write(sceneData.sceneWidth + os.EOL);
         this.rendingProcess.stdin.write(sceneData.sceneHeight + os.EOL);
+        
+        // TODO: Do the split and line streaming in one stream instead of piping through split
+        this.processOut = this.rendingProcess.stdout.pipe(split()),
 
         readyCallback(null, "Process has been started");
     } catch (e) {
@@ -53,15 +57,14 @@ Renderer.prototype.render = function (width, height, dx, dy) {
     // TODO: Check if quaddmg supports RGBA and add support here as well
     // Each "render" step is a separate data generation process so data is only relevant inside this method
     var data = new Buffer(height * width * COLOR_SIZE),
-        // TODO: Do the split and line streaming in one stream instead of piping through split
-        processOut = this.rendingProcess.stdout.pipe(split()),
         dataCallback = this.resultHandler,
+        that = this,
         handler;
     
     // Attach to the stdout while rendering since the output is dependent on the current execution
     handler = createStdOutHandler(data, width, height, function () {
         // Detach stdout once rendering is done
-        processOut.removeListener("data", handler);
+        that.processOut.removeListener("data", handler);
         
         // Report the result
         var renderResult = {
@@ -73,7 +76,7 @@ Renderer.prototype.render = function (width, height, dx, dy) {
         };
         dataCallback(renderResult);
     });
-    processOut.on("data", handler);
+    this.processOut.on("data", handler);
     
     // Init rendering
     this.rendingProcess.stdin.write("begin" + os.EOL);
