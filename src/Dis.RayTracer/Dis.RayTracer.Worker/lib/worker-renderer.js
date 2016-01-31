@@ -9,7 +9,6 @@ var spawn = require('child_process').spawn,
 
 module.exports = exports = Renderer;
 
-// TODO: Extract
 var COLOR_SIZE = 4;
 
 function Renderer(pathToExe, resultHandler) {

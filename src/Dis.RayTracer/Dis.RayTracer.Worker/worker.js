@@ -7,14 +7,17 @@ var Renderer = require('./lib/worker-renderer.js'),
     mkdirp = require('mkdirp'),
     fs = require('fs'),
     wsocket = require("socket.io-client"),
-    log = require('./lib/helpers.js').log;
+    log = require('./lib/helpers.js').log,
+    util = require('util');
 
 var socket,
     dataHandler,
     worker;
 
-// TODO: Command line param
-socket = wsocket("http://localhost:1337/worker-ns");
+if (!process.argv[2]) throw "Must supply the URL to connect to as the first parameter";
+var url = util.format("http://%s/worker-ns", process.argv[2]);
+log("Trying to connect to " + url);
+socket = wsocket(url);
 dataHandler = function (renderResult) {
     socket.emit("render-finished", renderResult);
 }
