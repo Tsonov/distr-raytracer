@@ -139,9 +139,12 @@
     socket.on("info", addDebugMessage);
     
     socket.on("rendering-block", function (blockInfo) {
-        // Aesthetics and all
-        context.fillStyle = "rgba(0, 0, 0, 0.2)";
-        context.fillRect(blockInfo.dx, blockInfo.dy, blockInfo.width, blockInfo.height);
+        // Avoid coloring blocks if they arrived in-between cancel request and cancel being done
+        if (rendering) {
+            // Aesthetics and all
+            context.fillStyle = "rgba(0, 0, 0, 0.2)";
+            context.fillRect(blockInfo.dx, blockInfo.dy, blockInfo.width, blockInfo.height);
+        }
     })
     
     socket.on("rendered-output", function (renderedResult) {
