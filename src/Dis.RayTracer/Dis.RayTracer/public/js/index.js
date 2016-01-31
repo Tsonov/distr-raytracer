@@ -99,7 +99,6 @@
         startTime,
         rendering = false;
     
-    // TODO: Fix the hardcoded value
     socket = io("/client-ns");
     
     socket.on("worker-added", function (workerInfo) {
