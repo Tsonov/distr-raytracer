@@ -7,17 +7,18 @@ var router = express.Router(),
     scenesDir = "raytracer/data/",
     scenes;
 
-scenes = fs.readdirSync(scenesDir)
-    .filter(function (file) { return path.extname(file) === '.trinity' })
-    .map(function (sceneFile) {
-    return {
-        path: path.join(scenesDir, sceneFile),
-        name: path.basename(sceneFile, '.trinity')
-    }
-});
 
 /* GET home page. */
 router.get('/', function (req, res) {
+    
+    scenes = fs.readdirSync(scenesDir)
+    .filter(function (file) { return path.extname(file) === '.trinity' })
+    .map(function (sceneFile) {
+        return {
+            path: path.join(scenesDir, sceneFile),
+            name: path.basename(sceneFile, '.trinity')
+        }
+    });
     res.render('index', { title: 'Dis.RayTracer', scenes: scenes });
 });
 

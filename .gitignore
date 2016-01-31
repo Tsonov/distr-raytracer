@@ -28,3 +28,5 @@ node_modules/
 # Ignore node tools fluff
 Microsoft.NodejsTools.WebRole.dll
 
+# Ignore the folder that is user-editable
+src/Dis.RayTracer/Dis.RayTracer/raytracer/data/

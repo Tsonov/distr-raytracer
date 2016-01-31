@@ -89,6 +89,7 @@
         heightRange = document.getElementById("height"),
         heightTxtbox = document.getElementById("heightTxt"),
         editLink = document.getElementById("editBtn"),
+        createLink = document.getElementById("createBtn"),
         scenesDropDown = document.getElementById("scenes"),
         debugArea = document.getElementById("debugarea"),
         canvas = document.getElementById("image"),
@@ -213,7 +214,6 @@
         var value = scenesDropDown.options[scenesDropDown.selectedIndex].value;
         editLink.setAttribute("href", "/scene?scenePath=" + encodeURIComponent(value));
     });
-
     
     // Set initial values
     widthTxtbox.value = "Width:" + widthRange.value;
@@ -221,4 +221,6 @@
     scenesDropDown.selectedIndex = 0;
     var value = scenesDropDown.options[scenesDropDown.selectedIndex].value;
     editLink.setAttribute("href", "/scene?scenePath=" + encodeURIComponent(value));
+
+    createLink.setAttribute("href", "/scene");
 }());
