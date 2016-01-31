@@ -44,7 +44,7 @@ Renderer.prototype.init = function (sceneData, pathToData, readyCallback) {
         this.rendingProcess.stdin.write(sceneData.sceneHeight + os.EOL);
         
         // TODO: Do the split and line streaming in one stream instead of piping through split
-        this.processOut = this.rendingProcess.stdout.pipe(split()),
+        this.processOut = this.rendingProcess.stdout.pipe(split());
 
         readyCallback(null, "Process has been started");
     } catch (e) {
@@ -84,15 +84,19 @@ Renderer.prototype.render = function (width, height, dx, dy) {
     this.rendingProcess.stdin.write(height + os.EOL);
     this.rendingProcess.stdin.write(dx + os.EOL);
     this.rendingProcess.stdin.write(dy + os.EOL);
-
 };
 
 Renderer.prototype.close = function () {
-    // Kill the underlying process to cancel all rendering
-    // Sending a close message is pointless since the raytracer is probably in progress
-    // Also, we are going to kill the process anyway so it can't really do much
-    this.rendingProcess.kill();
-    this.rendingProcess = null;
+    // Closing can happen before init is fully done so check first
+    if (this.rendingProcess) {
+        
+        // Kill the underlying process to cancel all rendering
+        // Sending a close message is pointless since the raytracer is probably in progress
+        // Also, we are going to kill the process anyway so it can't really do much
+        this.rendingProcess.kill();
+        this.rendingProcess = null;
+    }
+    
 }
 
 function createStdOutHandler(data, width, height, finishedCallBack) {

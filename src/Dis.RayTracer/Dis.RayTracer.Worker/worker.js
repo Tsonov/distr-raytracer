@@ -36,6 +36,7 @@ socket.on("init-render", function (sceneInfo) {
 
 socket.on("end-render", function () {
     log("Closing child renderer");
+    temp.cleanup();
     closeRendering(worker);
 })
 
@@ -105,7 +106,4 @@ function initializeFiles(sceneData, callback) {
 
 function closeRendering(worker) {
     worker.close();
-    // Do it synchronous to avoid re-starting the process and cleaning up a new folder instead
-    // TODO: This can be called before the child has had a chance to exit, needs a fix
-    //temp.cleanupSync();
 }
