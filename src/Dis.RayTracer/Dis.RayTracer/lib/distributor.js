@@ -8,7 +8,6 @@ var socketio = require('socket.io'),
 /* Exports */
 exports.distributor = distributor;
 
-// TODO: Refactor
 function distributor(socketServer) {
     var availableSockets = {},
         clientNs = socketServer.of("/client-ns"),    

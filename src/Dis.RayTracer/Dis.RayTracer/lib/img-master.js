@@ -11,7 +11,11 @@ module.exports = exports = ImageMaster;
 function ImageMaster(width, height, workers, client, scenePath, doneCallback) {
     if (!(this instanceof ImageMaster)) return new ImageMaster(width, height);
     
-    // TODO: Validations
+    if (width < 0 || height < 0 || workers.length === 0 || client === null || client === undefined) {
+        log("Invalid parameters detected");
+        log(JSON.stringify([width, height, workers, client]));
+        throw "Invalid parameters detected in image master" + JSON.stringify([width, height, workers, client]);
+    }
     this.width = width;
     this.height = height;
     this.workers = workers;
@@ -78,7 +82,6 @@ ImageMaster.prototype.start = function () {
         that = this;
     
     log("Worker length is " + this.workers.length + " and job length is " + jobs.length);
-    if (jobs.length < this.workers.length) throw "TODO: Handle case of too much resources";
     
     parseScene(this.scenePath, function (err, sceneData) {
         if (err) throw err;

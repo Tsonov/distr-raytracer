@@ -1,5 +1,11 @@
 ﻿exports.log = console.log.bind(console);
 
+exports.nonEmpty = function (value) {
+    if (value === null || value === undefined) return false;
+    if (typeof value === 'string' && value === '') return false;
+    return true;
+}
+
 exports.unsignedColorToNums = unsignedColorToNums = function (number, hasAlpha) {
     hasAlpha = hasAlpha || false;
     var redShift = hasAlpha ? 24 : 16,

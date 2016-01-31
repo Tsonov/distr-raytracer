@@ -4,6 +4,7 @@ var spawn = require('child_process').spawn,
     path = require('path'),
     split = require('split'),
     stringToColorNums = require('./helpers.js').stringToColorNums,
+    nonEmpty = require('./helpers.js').nonEmpty,
     log = require('./helpers.js').log;
 
 module.exports = exports = Renderer;
@@ -107,7 +108,7 @@ function createStdOutHandler(data, width, height, finishedCallBack) {
         started = false;
     
     result = function (line) {
-        if (line.length == 0) return; // TODO: Figure if the empty row comes from the library implementation
+        if (line.length == 0) return; 
         if (line.indexOf("Starting") !== -1) {
             log("Rending has now begun");
             started = true;
@@ -122,10 +123,9 @@ function createStdOutHandler(data, width, height, finishedCallBack) {
         }
         if (done || !started) return;
         
-        // TODO: Figure why is there an extra empty entry at the end
-        var colors = line.split(" ").map(stringToColorNums).slice(0, -1);
+       
+        var colors = line.split(" ").filter(nonEmpty).map(stringToColorNums);
         
-        // TODO: All Debug checks for sizes
         if (colors.length !== width) throw "Invalid size of colors array " + colors.length + ", expected " + width;
         for (let x = 0; x < colors.length; x++) {
             data[currentRow * width * COLOR_SIZE + x * COLOR_SIZE] = colors[x].r;

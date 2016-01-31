@@ -13,7 +13,6 @@ function parseScene(scenePath, callback) {
     resolveDependenciesList(scenePath, function (err, sceneData) {
         if (err) callback(err);
         
-        // TODO: Optimize memory usage
         var data = {
             sceneName: path.relative("raytracer/data/", scenePath),
             sceneContents: sceneData.sceneContents,
