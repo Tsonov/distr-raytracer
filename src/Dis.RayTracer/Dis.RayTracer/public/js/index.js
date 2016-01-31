@@ -100,7 +100,7 @@
         rendering = false;
     
     // TODO: Fix the hardcoded value
-    socket = io("http://localhost:1337/client-ns");
+    socket = io("/client-ns");
     
     socket.on("worker-added", function (workerInfo) {
         var li = document.createElement("li"),
