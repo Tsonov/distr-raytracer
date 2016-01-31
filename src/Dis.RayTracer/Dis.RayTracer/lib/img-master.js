@@ -53,8 +53,8 @@ ImageMaster.prototype.splitWork = function () {
     }, 0);
 
     capacityCoef = Math.max(1, capacityCoef / 2);
-    bucketWidth = (this.width / capacityCoef);
-    bucketHeight = (this.height / capacityCoef);
+    bucketWidth = Math.floor(this.width / capacityCoef);
+    bucketHeight = Math.floor(this.height / capacityCoef);
     bucketsOnX = Math.ceil((this.width - 1) / (bucketWidth + 1));
     bucketsOnY = Math.ceil((this.height - 1) / (bucketHeight + 1));
     for (let y = 0; y < bucketsOnY; y++) {
@@ -140,8 +140,12 @@ function giveWork(job, worker, client) {
 
 function workerResultHandler(manager, clientSocket, worker, doneCallBack, result) {
     log("Child " + worker.id + " has rendered a result");
-    manager.jobDone(result);
-    clientSocket.emit("rendered-output", result);
+    var wasNew = manager.jobDone(result);
+    if (wasNew) {
+        // Avoid sending output twice
+        clientSocket.emit("rendered-output", result);
+    }
+    
     
     if (manager.hasWork()) {
         // There are still jobs to process, give the worker a new one

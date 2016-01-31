@@ -8,6 +8,10 @@ a {
 #image {
   display: block;
 }
+#debugarea {
+  height: 1000px;
+  overflow-y: scroll;
+}
 #debugarea p {
   font: 9px "Lucida Console", Monaco, monospace;
   margin-bottom: 5px;
