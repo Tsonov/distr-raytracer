@@ -36,6 +36,7 @@
     <Compile Include="lib\img-master.js" />
     <Compile Include="lib\scene-parser.js" />
     <Compile Include="lib\job-manager.js" />
+    <Compile Include="lib\scene-manager.js" />
     <Compile Include="public\js\bootstrap\bootstrap.js" />
     <Compile Include="public\js\bootstrap\bootstrap.min.js" />
     <Compile Include="public\js\index.js" />

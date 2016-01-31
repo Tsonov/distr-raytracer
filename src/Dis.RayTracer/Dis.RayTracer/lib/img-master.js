@@ -166,5 +166,4 @@ function createWorkerHandler(manager, clientSocket, worker, callback) {
     return curry(workerResultHandler, manager, clientSocket, worker, callback);
 }
 
-// TODO: Freeze if it should be a const
-ImageMaster.COLOR_SIZE = 4; // RGBA, TODO: Make consistent with the raytracer and handle missing alpha
+ImageMaster.COLOR_SIZE = 4; // RGBA

@@ -1,22 +1,19 @@
 ﻿var express = require('express'),
     fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    sceneManager = require('../lib/scene-manager.js');
 
 var router = express.Router(),
-    // TODO: Could be better
-    scenesDir = "raytracer/data/",
     scenes;
 
 
 /* GET home page. */
 router.get('/', function (req, res) {
     
-    scenes = fs.readdirSync(scenesDir)
-    .filter(function (file) { return path.extname(file) === '.trinity' })
-    .map(function (sceneFile) {
+    scenes = sceneManager.getSceneFiles().map(function (sceneFile) {
         return {
-            path: path.join(scenesDir, sceneFile),
-            name: path.basename(sceneFile, '.trinity')
+            path: sceneManager.getPathToScene(sceneFile),
+            name: sceneManager.getSceneName(sceneFile)
         }
     });
     res.render('index', { title: 'Dis.RayTracer', scenes: scenes });
