@@ -24,13 +24,8 @@ if (!Array.prototype.findIndex) {
 }
 
 var fillCanvasWithData = function (context, colorBuffer, width, height, dx, dy) {
-    // TODO: Measure performance and check if that's a good way to use the API
-    // TODO: Detect missing typed arrays and raise an error
-    // TODO: Look into streaming
     var img = context.createImageData(width, height),
         colorArr = new Uint8ClampedArray(colorBuffer);
-    // TODO: Only RGBA-based colors allowed?
-    // TODO: Check math
     if (colorArr.length !== width * height * 4) throw "Unexpected color array length, expected " + width * height * 4 + " but got " + colorArr.length;
     
     img.data.set(colorArr);

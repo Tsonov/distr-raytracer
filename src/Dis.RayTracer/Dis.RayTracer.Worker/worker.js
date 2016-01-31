@@ -22,7 +22,6 @@ worker = new Renderer("raytracer/trinity.exe", dataHandler);
 
 socket.on("init-render", function (sceneInfo) {
     // Populate all files and the scene file before starting the renderer
-    // TODO: Return a stream here that can be piped to the master instead of using callbacks
     log("Initializing dependencies");
     initializeFiles(sceneInfo.sceneData, function (err, dataFolder) {
         if (err) throw err;

@@ -12,11 +12,10 @@ module.exports = exports = Renderer;
 // TODO: Extract
 var COLOR_SIZE = 4;
 
-// TODO: Make the callback a stream?
 function Renderer(pathToExe, resultHandler) {
     if (!(this instanceof Renderer)) return new Renderer(dataHandler);
     
-    // TODO: Validations
+
     this.rendingProcess = null;
     this.processOut = null;
     this.pathToExe = path.resolve(pathToExe);
@@ -44,7 +43,6 @@ Renderer.prototype.init = function (sceneData, pathToData, readyCallback) {
         this.rendingProcess.stdin.write(sceneData.sceneWidth + os.EOL);
         this.rendingProcess.stdin.write(sceneData.sceneHeight + os.EOL);
         
-        // TODO: Do the split and line streaming in one stream instead of piping through split
         this.processOut = this.rendingProcess.stdout.pipe(split());
 
         readyCallback(null, "Process has been started");
@@ -54,8 +52,6 @@ Renderer.prototype.init = function (sceneData, pathToData, readyCallback) {
 };
 
 Renderer.prototype.render = function (width, height, dx, dy) {
-    // TODO: Validations
-    // TODO: Check if quaddmg supports RGBA and add support here as well
     // Each "render" step is a separate data generation process so data is only relevant inside this method
     var data = new Buffer(height * width * COLOR_SIZE),
         dataCallback = this.resultHandler,
@@ -101,7 +97,6 @@ Renderer.prototype.close = function () {
 }
 
 function createStdOutHandler(data, width, height, finishedCallBack) {
-    // TODO: Assumes line-buffering right now, might not be optimal though
     var currentRow = 0,
         result,
         done = false,

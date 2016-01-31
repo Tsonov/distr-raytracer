@@ -9,18 +9,21 @@ router.get('/', function (req, res) {
     var scenePath = req.param("scenePath");
     if (scenePath) {
         // Existing scene
-        // TODO: Validation and return 404
-        fs.readFile(scenePath, 'utf8', function (err, contents) {
-            // TODO: Show error pages for errors...
-            if (err) throw err;
-            var sceneData = {
-                name: path.basename(scenePath, '.trinity'),
-                contents: contents,
-                scenePath: scenePath,
-                canRename: false
-            }
-            res.render('scene', sceneData);
-        })
+        if (fs.existsSync(scenePath) === false) {
+            res.status(404).send("Scene does not exist");
+        } else {
+            fs.readFile(scenePath, 'utf8', function (err, contents) {
+                if (err) throw err;
+                var sceneData = {
+                    name: path.basename(scenePath, '.trinity'),
+                    contents: contents,
+                    scenePath: scenePath,
+                    canRename: false
+                }
+                res.render('scene', sceneData);
+            })
+        }
+        
     }
     else {
         // New scene
