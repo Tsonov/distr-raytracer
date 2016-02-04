@@ -30,3 +30,4 @@ Microsoft.NodejsTools.WebRole.dll
 
 # Ignore the folder that is user-editable
 src/Dis.RayTracer/Dis.RayTracer/raytracer/data/
+/src/Dis.RayTracer/worker.zip
