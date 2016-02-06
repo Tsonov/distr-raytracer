@@ -147,7 +147,6 @@
     })
     
     socket.on("rendered-output", function (renderedResult) {
-        addDebugMessage("Received a bucket");
         addDebugMessage("Rendered result with width " + renderedResult.width + " and height " + renderedResult.height + " from [" + renderedResult.dx + ", " + renderedResult.dy + "]");
         
         fillCanvasWithData(context, renderedResult.bitmap, renderedResult.width, renderedResult.height, renderedResult.dx, renderedResult.dy);

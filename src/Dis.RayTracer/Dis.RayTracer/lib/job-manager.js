@@ -34,7 +34,9 @@ JobStore.prototype.getWork = function () {
     } else {
         // All jobs have been distributed
         // Hand over a long-running job in progress since we might have a slowpoke worker
-        result = this.jobsInProgress[0];
+        // Take the first job and put it back as last to avoid giving it a lot of times
+        result = this.jobsInProgress.shift();
+        this.jobsInProgress.push(result);
     }
 
     return result;

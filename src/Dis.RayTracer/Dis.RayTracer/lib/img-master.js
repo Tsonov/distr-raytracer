@@ -51,12 +51,8 @@ ImageMaster.prototype.splitWork = function () {
     // We want to minimize bucket communication as much as possible 
     // while still leaving some loose ends to account for variable worker capacity
     // Below is mostly emperical
-    var capacityCoef = this.workers.reduce(function (previous, current) {
-        var cpus = (current.info ? current.info.cores : 1);
-        return previous + cpus;
-    }, 0);
 
-    capacityCoef = Math.max(1, capacityCoef / 2);
+    capacityCoef = Math.max(1, Math.round(this.workers.length * 1.2));
     bucketWidth = Math.floor(this.width / capacityCoef);
     bucketHeight = Math.floor(this.height / capacityCoef);
     bucketsOnX = Math.ceil((this.width - 1) / (bucketWidth + 1));
