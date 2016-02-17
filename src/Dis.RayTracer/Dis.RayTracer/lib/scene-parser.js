@@ -18,20 +18,24 @@ function parseScene(scenePath, callback) {
             fileDependencies: []
         };
         
-        sceneData.dependencies.forEach(function (fileDependency) {
-            fs.readFile(fileDependency, 'binary', function (err, fileContents) {
-                if (err) callback(err);
-                
-                data.fileDependencies.push({
-                    relativePath: sceneManager.getSceneRelativePath(fileDependency),
-                    contents: fileContents
-                });
-                
-                if (data.fileDependencies.length === sceneData.dependencies.length) {
-                    callback(null, data);
-                }
-            })
-        });
+        if (sceneData.dependencies.length === 0) {
+            callback(null, data);
+        } else {
+            sceneData.dependencies.forEach(function (fileDependency) {
+                fs.readFile(fileDependency, 'binary', function (err, fileContents) {
+                    if (err) callback(err);
+                    
+                    data.fileDependencies.push({
+                        relativePath: sceneManager.getSceneRelativePath(fileDependency),
+                        contents: fileContents
+                    });
+                    
+                    if (data.fileDependencies.length === sceneData.dependencies.length) {
+                        callback(null, data);
+                    }
+                })
+            });
+        }
     })
 }
 
@@ -55,7 +59,7 @@ function resolveDependenciesList(scenePath, callback) {
             else {
                 callback("Invalid path " + dep + " found. Was neither a file, nor a dir");
             }
-        }).reduce(function (a, b) { return a.concat(b) });
+        }).reduce(function (a, b) { return a.concat(b) }, []);
         
         callback(null, { sceneContents: sceneData.sceneContents, dependencies: resolvedDependencies });
     });
