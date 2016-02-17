@@ -7,6 +7,11 @@ Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Dis.RayTracer", "Dis.RayTra
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Dis.RayTracer.Worker", "Dis.RayTracer.Worker\Dis.RayTracer.Worker.njsproj", "{4F1E6423-EE02-4B52-8433-99BF080981F8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{43A9997C-BCAB-4C42-9A5C-D5E2727F68F6}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Readme.md = ..\..\Readme.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
