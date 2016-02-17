@@ -9,6 +9,7 @@ Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Dis.RayTracer.Worker", "Dis
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{43A9997C-BCAB-4C42-9A5C-D5E2727F68F6}"
 	ProjectSection(SolutionItems) = preProject
+		..\..\License.md = ..\..\License.md
 		..\..\Readme.md = ..\..\Readme.md
 	EndProjectSection
 EndProject
